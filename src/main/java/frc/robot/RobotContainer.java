@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.AlignToHub;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
@@ -177,6 +178,8 @@ public class RobotContainer {
 
         new JoystickButton(controller, 2)
                 .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+         new JoystickButton(controller, 3)
+                .whileTrue(new AlignToHub(drive));
     }
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
