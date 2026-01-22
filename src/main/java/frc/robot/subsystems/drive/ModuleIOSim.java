@@ -1,4 +1,4 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright 2021-2024 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // This program is free software; you can redistribute it and/or
@@ -16,10 +16,11 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.util.SparkUtil;
-import java.util.Arrays;
+
+import edu.wpi.first.wpilibj.Timer;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
@@ -69,6 +70,8 @@ public class ModuleIOSim implements ModuleIO {
         driveMotor.requestVoltage(Volts.of(driveAppliedVolts));
         turnMotor.requestVoltage(Volts.of(turnAppliedVolts));
 
+
+
         // Update drive inputs
         inputs.driveConnected = true;
         inputs.drivePositionRad = moduleSimulation.getDriveWheelFinalPosition().in(Radians);
@@ -87,12 +90,10 @@ public class ModuleIOSim implements ModuleIO {
         inputs.turnCurrentAmps =
                 Math.abs(moduleSimulation.getSteerMotorStatorCurrent().in(Amps));
 
-        // Update odometry inputs
-        inputs.odometryTimestamps = SparkUtil.getSimulationOdometryTimeStamps();
-        inputs.odometryDrivePositionsRad = Arrays.stream(moduleSimulation.getCachedDriveWheelFinalPositions())
-                .mapToDouble(angle -> angle.in(Radians))
-                .toArray();
-        inputs.odometryTurnPositions = moduleSimulation.getCachedSteerAbsolutePositions();
+        // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't matter)
+        inputs.odometryTimestamps = new double[] {Timer.getFPGATimestamp()};
+        inputs.odometryDrivePositionsRad = new double[] {inputs.drivePositionRad};
+        inputs.odometryTurnPositions = new Rotation2d[] {inputs.turnPosition};
     }
 
     @Override
@@ -119,4 +120,4 @@ public class ModuleIOSim implements ModuleIO {
         turnClosedLoop = true;
         turnController.setSetpoint(rotation.getRadians());
     }
-}
+  }
