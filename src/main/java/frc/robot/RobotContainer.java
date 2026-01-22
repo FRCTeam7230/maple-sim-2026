@@ -15,17 +15,21 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
@@ -48,7 +52,7 @@ public class RobotContainer {
     private SwerveDriveSimulation driveSimulation = null;
 
     // Controller
-    private final CommandXboxController controller = new CommandXboxController(0);
+    private final GenericHID controller = new GenericHID(0);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -133,17 +137,35 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
+        // getX moves left/right.
+        // getY moves up/down.
         drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+                drive, () -> controller.getRawAxis(1), () -> controller.getRawAxis(0), () -> -controller.getRawAxis(2)));
+
+
+        double slowSpeed = 0.4;
+        new JoystickButton(controller, 3)
+                .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, slowSpeed, 0));
+
+                
+        new JoystickButton(controller, 4)
+        .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, -slowSpeed, 0));
+        new JoystickButton(controller, 5)
+        .whileTrue(DriveCommands.robotJoystickDrive(drive, slowSpeed, 0, 0));
+        new JoystickButton(controller, 6)
+        .whileTrue(DriveCommands.robotJoystickDrive(drive, -slowSpeed, 0, 0));
 
         // Lock to 0° when A button is held
-        controller
-                .a()
-                .whileTrue(DriveCommands.joystickDriveAtAngle(
-                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new Rotation2d()));
+        // new JoystickButton(controller, 3)
+        //         .whileTrue(DriveCommands.joystickDriveAtAngle(
+        //                 drive, () -> controller.getY(), () -> controller.getX(), () -> new Rotation2d()));
 
         // Switch to X pattern when X button is pressed
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        // new JoystickButton(controller, 4).onTrue(Commands.runOnce(drive::stopWithX, drive));
+        // new JoystickButton(controller, 1).onTrue(Commands.runOnce(drive::scoreAlgae, drive));
+        // new JoystickButton(controller, 5).onTrue(Commands.runOnce(drive::spawnAlgae, drive));
+        // new JoystickButton(controller, 6).onTrue(Commands.runOnce(drive::spawnCoral, drive));
+
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
@@ -152,34 +174,10 @@ public class RobotContainer {
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
                 : () -> drive.resetOdometry(
                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
-        // Example Coral Placement Code
-        // TODO: delete these code for your own project
-        if (Constants.currentMode == Constants.Mode.SIM) {
-            // L4 placement
-            controller.y().onTrue(Commands.runOnce(() -> SimulatedArena.getInstance()
-                    .addGamePieceProjectile(new ReefscapeCoralOnFly(
-                            driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-                            new Translation2d(0.4, 0),
-                            driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                            driveSimulation.getSimulatedDriveTrainPose().getRotation(),
-                            Meters.of(2),
-                            MetersPerSecond.of(1.5),
-                            Degrees.of(-80)))));
-            // L3 placement
-            controller.b().onTrue(Commands.runOnce(() -> SimulatedArena.getInstance()
-                    .addGamePieceProjectile(new ReefscapeCoralOnFly(
-                            driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-                            new Translation2d(0.4, 0),
-                            driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                            driveSimulation.getSimulatedDriveTrainPose().getRotation(),
-                            Meters.of(1.35),
-                            MetersPerSecond.of(1.5),
-                            Degrees.of(-60)))));
-        }
+        new JoystickButton(controller, 2)
+                .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
     }
-
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
