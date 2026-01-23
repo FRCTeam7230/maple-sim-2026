@@ -39,6 +39,7 @@ public class DriveCommands {
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
+  private static boolean IS_FIELD_RELATIVE = true;
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
@@ -57,6 +58,23 @@ public class DriveCommands {
         .transformBy(new Transform2d(linearMagnitude, 0.0, Rotation2d.kZero))
         .getTranslation();
   }
+
+      public static Command toggleDrive(){
+            return Commands.sequence(
+                    Commands.runOnce(() -> {
+                            if (IS_FIELD_RELATIVE){
+                                    IS_FIELD_RELATIVE = false;
+                            }else{
+                                    IS_FIELD_RELATIVE = true;
+                            }
+                    }),
+                    Commands.waitSeconds(1)
+            );
+    }
+
+    public static boolean getFieldRelative(){
+            return IS_FIELD_RELATIVE;
+    }
 
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
@@ -95,6 +113,32 @@ public class DriveCommands {
                       : drive.getRotation()));
         },
         drive);
+  }
+
+  public static Command robotJoystickDrive(
+                  Drive drive, double xSupplier, double ySupplier, double omegaSupplier) {
+      return Commands.run(
+                      () -> {
+                              // Get linear velocity
+                              Translation2d linearVelocity = getLinearVelocityFromJoysticks(
+                                      xSupplier, ySupplier);
+                              
+
+                              // Apply rotation deadband
+                              double omega = MathUtil.applyDeadband(omegaSupplier, DEADBAND);
+
+                              // Square rotation value for more precise control
+                              omega = Math.copySign(omega * omega, omega);
+
+                              // Convert to field relative speeds & send command
+                              ChassisSpeeds speeds = new ChassisSpeeds(
+                                              linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                                              linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                                              omega * drive.getMaxAngularSpeedRadPerSec());
+
+                              drive.runVelocity(speeds);
+                      },
+                      drive);
   }
 
   /**

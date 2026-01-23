@@ -22,6 +22,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -41,6 +42,13 @@ import frc.robot.Constants.Mode;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
+
+import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -65,13 +73,19 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
+  public SwerveDriveSimulation driveSimulation;
+  private IntakeSimulation intakeSimulation;
+  private final Consumer<Pose2d> resetSimulationPoseCallBack;
+  
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
-      ModuleIO brModuleIO) {
+      ModuleIO brModuleIO,
+      Consumer<Pose2d> resetSimulationPoseCallBack) {
     this.gyroIO = gyroIO;
+    this.resetSimulationPoseCallBack = resetSimulationPoseCallBack;
     modules[0] = new Module(flModuleIO, 0);
     modules[1] = new Module(frModuleIO, 1);
     modules[2] = new Module(blModuleIO, 2);
@@ -211,6 +225,12 @@ public class Drive extends SubsystemBase {
     runVelocity(new ChassisSpeeds());
   }
 
+  /** Resets the current odometry pose. */
+  public void resetOdometry(Pose2d pose) {
+      resetSimulationPoseCallBack.accept(pose);
+      poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+  }
+
   /**
    * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
    * return to their normal orientations the next time a nonzero velocity is requested.
@@ -312,5 +332,52 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  public void spawnFuel() {
+      SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(driveSimulation.getSimulatedDriveTrainPose().getTranslation()));
+  }
+
+  public void scoreFuel() {
+    if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
+    SimulatedArena.getInstance()
+    .addGamePieceProjectile(new RebuiltFuelOnFly(
+      // Obtain robot position from drive simulation
+      driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
+      // The scoring mechanism 
+      new Translation2d(0.46, 0),
+      // Obtain robot speed from drive simulation
+      driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+      // Obtain robot facing from drive simulation
+      driveSimulation.getSimulatedDriveTrainPose().getRotation(),
+      // The height at which the fuel is ejected
+      Meters.of(2.1),
+      // The initial speed of the fuel
+      MetersPerSecond.of(3),
+      // The fuel is at 45degrees
+      Degrees.of(45)));
+    }
+  }
+  public void initalizeIntake(){
+    intakeSimulation = IntakeSimulation.OverTheBumperIntake(
+        // Specify the type of game pieces that the intake can collect
+        "Fuel",
+        // Specify the drivetrain to which this intake is attached
+        driveSimulation,
+        // Width of the intake
+        Meters.of(0.7),
+        // The extension length of the intake beyond the robot's frame (when activated)
+        Meters.of(0.2),
+        // The intake is mounted on the back side of the chassis
+        IntakeSimulation.IntakeSide.FRONT,
+        // The intake can hold up to 60 fuel
+      60);
+  }
+
+  public void intakeStop(){
+    this.intakeSimulation.stopIntake();
+  }
+  public void intakeStart(){
+    this.intakeSimulation.startIntake();
   }
 }
