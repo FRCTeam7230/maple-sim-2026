@@ -134,7 +134,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
-
+  public void registerDrive(SwerveDriveSimulation driveSimulation){
+    this.driveSimulation = driveSimulation;
+  }
   @Override
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -432,4 +434,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
         poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
+
+    
 }

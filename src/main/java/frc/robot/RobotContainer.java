@@ -70,9 +70,11 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        Arena2026Rebuilt arena2026 = new Arena2026Rebuilt(false );
-        arena2026.setShouldRunClock(false);
-        SimulatedArena.overrideInstance(arena2026);
+        Arena2026Rebuilt arena = new Arena2026Rebuilt(false);
+        arena.isActive(true);
+        arena.setShouldRunClock(true);
+        arena.setEfficiencyMode(true);
+        SimulatedArena.overrideInstance(arena);
 
         switch (Constants.currentMode) {
             case REAL:
@@ -127,7 +129,11 @@ public class RobotContainer {
 
                 break;
         }
-
+        drive.registerDrive(driveSimulation);
+        drive.initalizeIntake();
+        NamedCommands.registerCommand("Intake Fuel", Commands.runOnce(()->drive.intakeStart(),drive));
+        NamedCommands.registerCommand("Stop Intake", Commands.runOnce(()->drive.intakeStop(),drive));
+        NamedCommands.registerCommand("Shoot", Commands.runOnce(()->drive.shootWithVariance(),drive));
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -142,8 +148,9 @@ public class RobotContainer {
         autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
         // Configure the button bindings
-        
-        SmartDashboard.putData("Set Robot Position",new PathPlannerAuto("Set Robot Position"));
+
+        SmartDashboard.putData("Outpost + Depot Auto",new PathPlannerAuto("Outpost + Depot Auto"));
+         SmartDashboard.putData("Outpost Auto",new PathPlannerAuto("Outpost Auto"));
         configureButtonBindings();
     }
 
