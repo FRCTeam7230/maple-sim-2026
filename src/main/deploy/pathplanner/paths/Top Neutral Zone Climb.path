@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 1.4294000000000002,
-        "y": 3.8011333333333326
+        "x": 1.0631669044222536,
+        "y": 4.584893009985735
       },
       "prevControl": {
-        "x": 1.4161784372467556,
-        "y": 4.0507834690800655
+        "x": 1.049945341669009,
+        "y": 4.834543145732468
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "climb"
+      "linkedName": "Top clmb"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -1.789910608246049
+    "rotation": 87.7093899573615
   },
   "reversed": false,
   "folder": null,

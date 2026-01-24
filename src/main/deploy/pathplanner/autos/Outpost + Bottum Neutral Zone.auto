@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Intake Fuel"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Bottum Neutral Zone to Shooting"
