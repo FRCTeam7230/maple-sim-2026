@@ -20,6 +20,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
@@ -170,8 +171,34 @@ public class Vision extends SubsystemBase {
         Logger.recordOutput(
                 "Vision/Summary/RobotPosesRejected",
                 allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
+        
+        //         List<Translation3d> lines = createLines(0);
+        //  Logger.recordOutput(
+        //                     "Vision/Summary/Lines",
+        //                 createLines(0).toArray(new Translation3d[lines.size()]));
+            
     }
-
+            
+            
+            // public List<Translation3d> createLines(int cameraIndex){
+            //     List<Pose3d> posesForLines = getAllTags(0);
+            //     List<Translation3d> targets = new LinkedList<Translation3d>();
+            //     for (Pose3d i : posesForLines){
+            //         targets.add(i.getTranslation());
+            //     }
+            //     return targets;
+            //             }
+public List<Pose3d> getAllTags(int cameraIndex){//This would be more efficient if I could extract information from Logger or from periodic method.
+        List<Pose3d> tagPoses = new LinkedList<>();
+        // Add tag poses
+        for (int tagId : inputs[cameraIndex].tagIds) {
+            var tagPose = aprilTagLayout.getTagPose(tagId);
+            if (tagPose.isPresent()) {
+                tagPoses.add(tagPose.get());
+            }
+        }
+        return tagPoses;
+    }
     @FunctionalInterface
     public interface VisionConsumer {
         void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs);

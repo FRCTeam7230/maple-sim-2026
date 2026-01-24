@@ -27,7 +27,9 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -49,6 +51,11 @@ import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+
+import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -74,6 +81,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
             new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
     private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
+     private IntakeSimulation intakeSimulation;
+     
     public Drive(
             GyroIO gyroIO,
             ModuleIO flModuleIO,
@@ -93,7 +102,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
         // Start odometry thread
         SparkOdometryThread.getInstance().start();
-
+                    
         // Configure AutoBuilder for PathPlanner
         AutoBuilder.configure(
                 this::getPose,
@@ -252,6 +261,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         }
         return states;
     }
+    
 
     /** Returns the measured chassis speeds of the robot. */
     @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
@@ -276,7 +286,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         }
         return output;
     }
-
+    
     /** Returns the current odometry pose. */
     @AutoLogOutput(key = "Odometry/Robot")
     public Pose2d getPose() {
@@ -308,5 +318,23 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     /** Returns the maximum angular speed in radians per sec. */
     public double getMaxAngularSpeedRadPerSec() {
         return maxSpeedMetersPerSec / driveBaseRadius;
+    }
+
+    public void scoreFuel (SwerveDriveSimulation driveSimulation){
+        //RebuiltFuelOnFly.setHitNetCallBack(() -> System.out.println("ALGAE hits NET!"));
+        SimulatedArena.getInstance()
+            .addGamePieceProjectile(new RebuiltFuelOnFly(
+                driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
+                new Translation2d(),
+                driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+                driveSimulation.getSimulatedDriveTrainPose().getRotation(),
+                Meters.of(0.4),
+                MetersPerSecond.of(9),
+                Degrees.of(80)) // shooter angle
+                .withProjectileTrajectoryDisplayCallBack(
+                    (poses) -> Logger.recordOutput("successfulShotsTrajectory", poses.toArray(Pose3d[]::new)),
+                    (poses) -> Logger.recordOutput("missedShotsTrajectory", poses.toArray(Pose3d[]::new)))
+            .enableBecomesGamePieceOnFieldAfterTouchGround()
+                    );
     }
 }

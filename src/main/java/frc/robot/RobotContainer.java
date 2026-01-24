@@ -36,6 +36,7 @@ import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -69,6 +70,10 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+        Arena2026Rebuilt arena2026 = new Arena2026Rebuilt(false );
+        arena2026.setShouldRunClock(false);
+        SimulatedArena.overrideInstance(arena2026);
+
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
@@ -137,6 +142,8 @@ public class RobotContainer {
         autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
         // Configure the button bindings
+        
+        SmartDashboard.putData("Set Robot Position",new PathPlannerAuto("Set Robot Position"));
         configureButtonBindings();
     }
 
@@ -185,8 +192,14 @@ public class RobotContainer {
                 : () -> drive.resetOdometry(
                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
 
-        new JoystickButton(controller, 2)
-                .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        // new JoystickButton(controller, 2)
+        //         .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        
+        new JoystickButton(controller, 1)
+                .onTrue(Commands.runOnce(()->drive.scoreFuel(driveSimulation),drive));
+       // Arena2026Rebuilt a = SimulatedArena.getInstance();
+
+       
     }
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -200,7 +213,7 @@ public class RobotContainer {
     public void resetSimulationField() {
         if (Constants.currentMode != Constants.Mode.SIM) return;
 
-        drive.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
+        drive.resetOdometry(new Pose2d(2, 4, new Rotation2d()));
         SimulatedArena.getInstance().resetFieldForAuto();
     }
 

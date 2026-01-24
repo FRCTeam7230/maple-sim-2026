@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -22,7 +23,29 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+    public static class LimelightConstants
+  {
+    public static final String kLimelightName = "limelight";
 
+    public static final double kDriveForwardKp = 2.4;
+    public static final double kDriveHorizontalKp = 1.5; //output = -1 to 1, .1 m off want .1 m/s, 0.1 m/s = 0.04 % output, .04 = kp*0.1, kp = .4
+    public static final double kRotationKp = 0.04; //output = -1 to 1, 15 deg off want 60 deg/sec, 60 deg/sec = 1.0 % output, 1.0 = kp*15deg, kp = 0.06
+
+    public static final double kHorizontalOffset = 0.17;
+    public static final double kForwardExtendedOffset = -0.43; //TODO: -0.47 at comp!
+    public static final double kForwardUnextendedOffset = -0.7;
+
+    public static final double kPositionErrorThreshold = 0.05;
+    public static final double kRotationErrorThreshold = 1; // deg
+    public static final double kElevatorTolerance = 0.02; //m
+
+    public enum reefAlignSide
+    {
+      Right,
+      Left,
+    }
+  }
+  
     public static enum Mode {
         /** Running on a real robot. */
         REAL,
@@ -33,4 +56,40 @@ public final class Constants {
         /** Replaying from a log file. */
         REPLAY
     }
-}
+
+    public static class ElevatorConstants
+    {
+  
+      public static final double kElevatorKp = 5;
+      public static final double kElevatorKi = 0;
+      public static final double kElevatorKd = 0;
+  
+      public static final double kElevatorkS = 0.0; // volts (V)
+      public static final double kElevatorkG = 0.762; // volts (V)
+      public static final double kElevatorkV = 0.762; // volt per velocity (V/(m/s))
+      public static final double kElevatorkA = 0.0; // volt per acceleration (V/(m/s²))
+  
+      public static final double kElevatorGearing = 10.0;
+      public static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
+      public static final double kCarriageMass = 4.0; // kg
+  
+      // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
+      public static final double kMinElevatorHeightMeters = 0.0;
+      //public static final double kMaxElevatorHeightMeters = 10.25;
+      public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(72);
+  
+      public static final double kRotationToMeters = kElevatorDrumRadius * 2 * Math.PI;
+      public static final double kRPMtoMPS = (kElevatorDrumRadius * 2 * Math.PI) / 60;
+      public static final double kElevatorMaxVelocity = 3.5;
+      public static final double kElevatorMaxAcceleration = 2.5;
+    }
+
+    public static class IntakeConstants {
+      public static enum Side {
+        BLUE,
+        RED
+      }
+      //Intake position
+      //
+    }
+  }
