@@ -196,7 +196,7 @@ public class RobotContainer {
         //         .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         
         new JoystickButton(controller, 1)
-                .onTrue(Commands.runOnce(()->drive.scoreFuel(driveSimulation),drive));
+                .onTrue(Commands.runOnce(()->drive.scoreFuel(),drive));
        // Arena2026Rebuilt a = SimulatedArena.getInstance();
 
        
