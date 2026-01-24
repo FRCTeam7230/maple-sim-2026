@@ -43,7 +43,7 @@ public class RobotContainer {
     private SwerveDriveSimulation driveSimulation = null;
 
     // Controller
-    private final Boolean controllerMode = true;
+    private final Boolean controllerMode = false;
     private final GenericHID controller = new GenericHID(0);
 
     // Dashboard inputs
@@ -200,6 +200,10 @@ public class RobotContainer {
 
             new JoystickButton(controller, 2)
                     .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+                        new JoystickButton(controller, /*change*/7)
+                .onTrue(
+                        Commands.runOnce(drive::intakeStart, drive)
+                );
         }
     }
 
