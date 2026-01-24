@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.1955961233702213,
-        "y": 4.013859051481159
+        "x": 1.047985109221121,
+        "y": 4.526763019661658
       },
       "isLocked": false,
       "linkedName": "Depot Shooting"
     },
     {
       "anchor": {
-        "x": 1.4294000000000002,
-        "y": 3.8011333333333326
+        "x": 1.0631669044222536,
+        "y": 4.584893009985735
       },
       "prevControl": {
-        "x": 1.8458256148386503,
-        "y": 4.143934578730105
+        "x": 1.3462469055071151,
+        "y": 4.9200006202207796
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "climb"
+      "linkedName": "Top clmb"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -1.789910608246049
+    "rotation": 87.7093899573615
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 140.71059313749964
+    "rotation": 140.71059313749967
   },
   "useDefaultConstraints": true
 }

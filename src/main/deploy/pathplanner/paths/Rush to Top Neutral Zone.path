@@ -16,16 +16,32 @@
     },
     {
       "anchor": {
-        "x": 8.016644444444445,
-        "y": 6.685488888888889
+        "x": 6.80793152639087,
+        "y": 7.237318116975749
       },
       "prevControl": {
-        "x": 6.967891048517607,
-        "y": 6.962170434366921
+        "x": 5.824593437945793,
+        "y": 7.666754588682836
+      },
+      "nextControl": {
+        "x": 7.335230300453929,
+        "y": 7.007039916904015
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.804208273894435,
+        "y": 5.3353352353780314
+      },
+      "prevControl": {
+        "x": 8.231184022824536,
+        "y": 5.839942938659058
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Top Neutral Zone intake"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +58,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -115.82099197418941
+    "rotation": -117.40757543781824
   },
   "reversed": false,
   "folder": null,

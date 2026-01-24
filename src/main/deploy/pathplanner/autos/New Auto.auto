@@ -7,31 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Rush to Bottum Neutral Zone"
+            "pathName": "The circle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Bottum Neutral Zone to Shooting"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "pathName": "The circle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Bottum Neutral Zone to Climb"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Climb"
+            "pathName": "The circle"
           }
         }
       ]

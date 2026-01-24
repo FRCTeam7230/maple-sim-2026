@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.686433333333334,
-        "y": 2.680522222222221
+        "x": 2.020627674750356,
+        "y": 1.8807132667617692
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9160782490061652,
-        "y": 3.4689892726913376
+        "x": 2.2229836240139687,
+        "y": 1.7025834932101207
       },
       "isLocked": false,
       "linkedName": "Outpost Shooting"
     },
     {
       "anchor": {
-        "x": 1.4294000000000002,
-        "y": 3.8011333333333326
+        "x": 0.9984736091298143,
+        "y": 2.680522222222221
       },
       "prevControl": {
-        "x": 2.5928015969782847,
-        "y": 3.436518403053685
+        "x": 1.9228611644040927,
+        "y": 1.9961581107738748
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -1.789910608246049
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -131.11209043916696
+    "rotation": -131.112090439167
   },
   "useDefaultConstraints": true
 }

@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Rush to Bottum Neutral Zone"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Bottum Neutral Zone to Shooting"
+            "pathName": "Disrupt path"
           }
         },
         {
@@ -25,13 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Bottum Neutral Zone to Climb"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Climb"
+            "pathName": "Top Neutral Zone Climb"
           }
         }
       ]
