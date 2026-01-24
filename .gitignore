@@ -185,3 +185,12 @@ compile_commands.json
 
 # Eclipse generated file for annotation processors
 .factorypath
+.gradle/8.11/checksums/checksums.lock
+.gradle/8.11/checksums/md5-checksums.bin
+.gradle/8.11/checksums/sha1-checksums.bin
+.gradle/8.11/executionHistory/executionHistory.bin
+.gradle/8.11/executionHistory/executionHistory.lock
+.gradle/8.11/fileHashes/fileHashes.bin
+.gradle/8.11/fileHashes/fileHashes.lock
+.gradle/8.11/fileHashes/resourceHashesCache.bin
+.gradle/buildOutputCleanup/buildOutputCleanup.lock

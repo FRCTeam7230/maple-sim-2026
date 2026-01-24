@@ -26,6 +26,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.littletonrobotics.junction.Logger;
 
 
@@ -50,6 +51,13 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+        Arena2026Rebuilt arena = new Arena2026Rebuilt(false);
+        arena.isActive(true);
+        arena.setShouldRunClock(true);
+        arena.setEfficiencyMode(true);
+        SimulatedArena.overrideInstance(arena);
+        
+
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
@@ -211,9 +219,10 @@ public class RobotContainer {
         SimulatedArena.getInstance().resetFieldForAuto();
     }
 
-    public void displaySimFieldToAdvantageScope() {
+    public void updateSimulation() {
         if (Constants.currentMode != Constants.Mode.SIM) return;
 
+        SimulatedArena.getInstance().simulationPeriodic();
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
         Logger.recordOutput(
                 "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
