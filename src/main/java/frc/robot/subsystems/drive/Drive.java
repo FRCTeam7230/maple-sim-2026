@@ -30,6 +30,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -358,6 +361,49 @@ public class Drive extends SubsystemBase {
       // The fuel is at 45degrees
       Degrees.of(45)));
     }
+  }
+  public void shootWithVariance() {
+    if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
+    SimulatedArena.getInstance()
+    .addGamePieceProjectile(new RebuiltFuelOnFly(
+      // Obtain robot position from drive simulation
+      driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
+      // The scoring mechanism 
+      new Translation2d(0.46, 0),
+      // Obtain robot speed from drive simulation
+      driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+      // Obtain robot facing from drive simulation
+      driveSimulation.getSimulatedDriveTrainPose().getRotation(),
+      // The height at which the fuel is ejected
+      Meters.of(2.1),
+      // The initial speed of the fuel
+      MetersPerSecond.of(3),
+      // The fuel is at 45degrees
+      Degrees.of(45)));
+    }
+  }
+  public static double randomInRange(double variance) {
+      return (Math.random() - 0.5) * variance;
+  }
+  public void addPieceWithVariance(
+        Translation2d piecePose,
+        Rotation2d yaw,
+        Distance height,
+        LinearVelocity speed,
+        Angle pitch,
+        double xVariance,
+        double yVariance,
+        double yawVariance,
+        double speedVariance,
+        double pitchVariance) {
+      SimulatedArena.getInstance().addGamePieceProjectile(new RebuiltFuelOnFly(
+              piecePose.plus(new Translation2d(randomInRange(xVariance), randomInRange(yVariance))),
+              new Translation2d(),
+              new ChassisSpeeds(),
+              yaw.plus(Rotation2d.fromDegrees(randomInRange(yawVariance))),
+              height,
+              speed.plus(MetersPerSecond.of(randomInRange(speedVariance))),
+              Degrees.of(pitch.in(Degrees) + randomInRange(pitchVariance))));
   }
   public void initalizeIntake(){
     intakeSimulation = IntakeSimulation.OverTheBumperIntake(
