@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.AlignToHub;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
 import org.ironmaple.simulation.SimulatedArena;
@@ -185,12 +186,7 @@ public class RobotContainer {
             
             new JoystickButton(controller, 11).whileTrue(DriveCommands.toggleDrive());
 
-            new JoystickButton(controller, 3)
-                    .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, slowSpeed, 0));
 
-                    
-            new JoystickButton(controller, 4)
-            .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, -slowSpeed, 0));
             new JoystickButton(controller, 5)
             .whileTrue(DriveCommands.robotJoystickDrive(drive, slowSpeed, 0, 0));
             new JoystickButton(controller, 6)
@@ -198,12 +194,14 @@ public class RobotContainer {
 
             new JoystickButton(controller, 1).onTrue(Commands.runOnce(drive::scoreFuel, drive));
 
-            new JoystickButton(controller, 2)
+            new JoystickButton(controller, 3)
                     .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
                         new JoystickButton(controller, /*change*/7)
                 .onTrue(
                         Commands.runOnce(drive::intakeStart, drive)
                 );
+            new JoystickButton(controller, 2).whileTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true).andThen(new AlignToHub(drive)));
+
         }
     }
 

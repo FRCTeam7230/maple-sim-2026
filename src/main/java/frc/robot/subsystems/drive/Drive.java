@@ -75,7 +75,7 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition()
       };
   private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d(3,3,Rotation2d.kZero));
 
   public SwerveDriveSimulation driveSimulation;
   private IntakeSimulation intakeSimulation;
@@ -355,11 +355,11 @@ public class Drive extends SubsystemBase {
       // Obtain robot facing from drive simulation
       driveSimulation.getSimulatedDriveTrainPose().getRotation(),
       // The height at which the fuel is ejected
-      Meters.of(2.1),
+      Meters.of(.38),
       // The initial speed of the fuel
-      MetersPerSecond.of(3),
+      MetersPerSecond.of(7),
       // The fuel is at 45degrees
-      Degrees.of(45)));
+      Degrees.of(70)));
     }
   }
   public void shootWithVariance() {
@@ -377,7 +377,7 @@ public class Drive extends SubsystemBase {
       // The height at which the fuel is ejected
       Meters.of(2.1),
       // The initial speed of the fuel
-      MetersPerSecond.of(3),
+      MetersPerSecond.of(0),
       // The fuel is at 45degrees
       Degrees.of(45)));
     }
