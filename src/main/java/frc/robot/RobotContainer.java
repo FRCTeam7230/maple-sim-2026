@@ -42,8 +42,8 @@ public class RobotContainer {
     private SwerveDriveSimulation driveSimulation = null;
 
     // Controller
-    private final Boolean controllerMode = false;
-    private final GenericHID controller = controllerMode ? new XboxController(0) : new Joystick(0);
+    private final Boolean controllerMode = true;
+    private final GenericHID controller = new GenericHID(0);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
