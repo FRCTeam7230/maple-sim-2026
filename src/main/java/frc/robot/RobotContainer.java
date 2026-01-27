@@ -25,6 +25,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlignToHub;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.vision.*;
+import static frc.robot.subsystems.vision.VisionConstants.*;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
@@ -42,6 +45,7 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private SwerveDriveSimulation driveSimulation = null;
+    private final Vision vision;
 
     // Controller
     private final Boolean controllerMode = false;
@@ -69,6 +73,12 @@ public class RobotContainer {
                         new ModuleIOSpark(2),
                         new ModuleIOSpark(3),
                         (pose) -> {});
+
+                this.vision = new Vision(
+                        drive,
+                        new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                        new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+
                 break;
 
             case SIM:
@@ -85,6 +95,13 @@ public class RobotContainer {
                         new ModuleIOSim(driveSimulation.getModules()[2]),
                         new ModuleIOSim(driveSimulation.getModules()[3]),
                         driveSimulation::setSimulationWorldPose);
+                
+                vision = new Vision(
+                        drive,
+                        new VisionIOPhotonVisionSim(
+                                camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
+                        new VisionIOPhotonVisionSim(
+                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
                 drive.driveSimulation = driveSimulation;
                 
@@ -93,7 +110,13 @@ public class RobotContainer {
             default:
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
-                        new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {},(pose) -> {});
+                        new GyroIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        (pose) -> {});
+                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
                 break;
         }
 
@@ -217,7 +240,7 @@ public class RobotContainer {
     public void resetSimulationField() {
         if (Constants.currentMode != Constants.Mode.SIM) return;
 
-        driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
+        drive.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
         SimulatedArena.getInstance().resetFieldForAuto();
     }
 

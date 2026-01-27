@@ -46,6 +46,7 @@ import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import frc.robot.subsystems.vision.Vision;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
@@ -56,7 +57,7 @@ import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Drive extends SubsystemBase {
+public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -235,6 +236,8 @@ public class Drive extends SubsystemBase {
       poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
+  
+
   /**
    * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
    * return to their normal orientations the next time a nonzero velocity is requested.
@@ -333,6 +336,11 @@ public class Drive extends SubsystemBase {
     return maxSpeedMetersPerSec;
   }
 
+  @Override
+  public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
+      poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+  }
+
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
@@ -362,30 +370,10 @@ public class Drive extends SubsystemBase {
       Degrees.of(70)));
     }
   }
-  public void shootWithVariance() {
-    if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
-    SimulatedArena.getInstance()
-    .addGamePieceProjectile(new RebuiltFuelOnFly(
-      // Obtain robot position from drive simulation
-      driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-      // The scoring mechanism 
-      new Translation2d(0.46, 0),
-      // Obtain robot speed from drive simulation
-      driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-      // Obtain robot facing from drive simulation
-      driveSimulation.getSimulatedDriveTrainPose().getRotation(),
-      // The height at which the fuel is ejected
-      Meters.of(2.1),
-      // The initial speed of the fuel
-      MetersPerSecond.of(0),
-      // The fuel is at 45degrees
-      Degrees.of(45)));
-    }
-  }
   public static double randomInRange(double variance) {
       return (Math.random() - 0.5) * variance;
   }
-  public void addPieceWithVariance(
+  public void shootWithVariance(
         Translation2d piecePose,
         Rotation2d yaw,
         Distance height,
