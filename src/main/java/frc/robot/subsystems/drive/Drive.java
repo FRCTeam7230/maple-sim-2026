@@ -38,7 +38,9 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -47,6 +49,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import frc.robot.subsystems.vision.Vision;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
@@ -408,11 +411,29 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
         // The intake can hold up to 60 fuel
       60);
   }
-
+  public boolean hasFuelInIntake(){
+    return this.intakeSimulation.getGamePiecesAmount() > 0;
+  }
   public void intakeStop(){
     this.intakeSimulation.stopIntake();
   }
   public void intakeStart(){
     this.intakeSimulation.startIntake();
   }
+    // public void spamScore(){
+    //   Command score = new SequentialCommandGroup(
+    //     new InstantCommand(() -> scoreFuel()),
+    //     new WaitCommand(1)
+    //   ).repeatedly();
+
+    //     // int counter = 200;
+    //     // if (this.intakeSimulation.getGamePiecesAmount() > 0){
+    //     //   counter--;
+    //     //   if (counter <= 0){
+    //     //     scoreFuel();
+    //     //     counter = 200;
+    //     //   }
+    //     // }
+    // }
+    
 }

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlignToHub;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SpamShootCommands;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
@@ -150,6 +152,27 @@ public class RobotContainer {
     private void configureButtonBindings() {
         double slowSpeed = 0.4;
 
+                
+        new JoystickButton(controller, 4)
+        .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, -slowSpeed, 0));
+        new JoystickButton(controller, 5)
+        .whileTrue(DriveCommands.robotJoystickDrive(drive, slowSpeed, 0, 0));
+        new JoystickButton(controller, 6)
+        .whileTrue(DriveCommands.robotJoystickDrive(drive, -slowSpeed, 0, 0));
+        
+        // Lock to 0° when A button is held
+        // new JoystickButton(controller, 3)
+        //         .whileTrue(DriveCommands.joystickDriveAtAngle(
+        //                 drive, () -> controller.getY(), () -> controller.getX(), () -> new Rotation2d()));
+
+        // Switch to X pattern when X button is pressed
+        // new JoystickButton(controller, 4).onTrue(Commands.runOnce(drive::stopWithX, drive));
+        // new JoystickButton(controller, 1).onTrue(Commands.runOnce(drive::scoreAlgae, drive));
+        // new JoystickButton(controller, 5).onTrue(Commands.runOnce(drive::spawnAlgae, drive));
+        // new JoystickButton(controller, 6).onTrue(Commands.runOnce(drive::spawnCoral, drive));
+
+
+        // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
         ? () -> drive.resetOdometry(
                 driveSimulation
@@ -176,6 +199,14 @@ public class RobotContainer {
             new JoystickButton(controller, /*change*/2)
                 .whileTrue(DriveCommands.toggleDrive().alongWith(Commands.run(() -> controller.setRumble(
                         RumbleType.kBothRumble, 0.5)))); //toggle Field Relative
+        // new JoystickButton(controller, 2)
+        //         .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        drive.intakeStart();
+        new JoystickButton(controller, 1)
+                .onTrue(
+                            new SpamShootCommands(drive)
+                );
+       // Arena2026Rebuilt a = SimulatedArena.getInstance();
 
             new JoystickButton(controller, /*change*/3)
                 .onTrue(
