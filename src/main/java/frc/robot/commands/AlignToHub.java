@@ -9,6 +9,7 @@ import java.util.Optional;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
@@ -19,7 +20,11 @@ public class AlignToHub extends Command {
   Drive m_drive;
   PIDController xController = new PIDController(1, 0, 0);
   PIDController yController = new PIDController(1, 0, 0);
-  PIDController rotController = new PIDController(0.03, 0, 0);
+  PIDController rotController = new PIDController(0.03, 0, 0.001);
+
+  private final GenericHID controller = new GenericHID(0);
+  double speedMult = 0.6;
+  double globalTargetAngle;
 
   Command drivecommand = null;
   public AlignToHub(Drive drive) {
@@ -29,6 +34,7 @@ public class AlignToHub extends Command {
     rotController.setSetpoint(0);
     rotController.enableContinuousInput(-180, 180);
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_drive);
   }
 
   // Called when the command is initially scheduled.
@@ -44,7 +50,11 @@ public class AlignToHub extends Command {
     double ySpeed = yController.calculate(errors[1]);
     double rotSpeed = Math.max(Math.min(rotController.calculate(errors[2]),1.5), -1.5);
     SmartDashboard.putNumber("Rotation delivered", rotSpeed);
-    drivecommand = DriveCommands.joystickDrive(m_drive, ()->{return -xSpeed;}, ()->{return -ySpeed;},()->{return -rotSpeed;});
+    drivecommand = DriveCommands.joystickDrive(
+      m_drive,
+      ()->{return -(xSpeed + (controller.getRawAxis(0) * speedMult * Math.sin(Math.toRadians(-globalTargetAngle))));},
+      ()->{return -(ySpeed  + (controller.getRawAxis(0) * speedMult * Math.cos(Math.toRadians(-globalTargetAngle))));},
+      ()->{return -rotSpeed;});
     drivecommand.execute();
   }
 
@@ -65,7 +75,6 @@ public class AlignToHub extends Command {
         double robotX = pose.getX();
 		    double robotY = pose.getY();
 
-
         double[] errors = new double[3];
         double radius = 2.75;
         double hubY = 4.03; // meters
@@ -85,18 +94,27 @@ public class AlignToHub extends Command {
         double distance = Math.sqrt( Math.pow( distanceX, 2) + Math.pow( distanceY, 2) );
 
 
-       
-
-
         double errorX = distanceX * ( (distance - radius) / distance );
         double errorY = distanceY * ( (distance - radius) / distance );
-        double targetAngle = Math.signum(distanceY) * Math.acos(distanceX / distance)*180/Math.PI;
+        double targetAngle = Math.signum(distanceY) * Math.toDegrees(Math.acos(distanceX / distance));
+        globalTargetAngle = targetAngle;
         double errorAngle = targetAngle - pose.getRotation().getDegrees();
 
+        double shooterOffset = .46; //meters
+        double initialEjectionVelocity = 6.5; //m/s
+        double ejectionAngle = 68; //deg
 
-		errors[0] = errorX;
-		errors[1] = errorY;
-		errors[2] = errorAngle;
+        double timeOfFlight = (radius - shooterOffset)/(initialEjectionVelocity*Math.cos(Math.toRadians(ejectionAngle)));
+        double initialVelocityRobotRelative = m_drive.getChassisSpeeds().vyMetersPerSecond;
+
+        double angleOffset = Math.toDegrees(Math.atan(initialVelocityRobotRelative * timeOfFlight/radius));
+        SmartDashboard.putNumber("AlignToHub/ErrorX", errors[0]);
+
+		    errors[0] = errorX;
+		    errors[1] = errorY;
+		    errors[2] = errorAngle - (1*angleOffset);
+
+
        SmartDashboard.putNumber("AlignToHub/TargetAngle",targetAngle);
 
         SmartDashboard.putNumber("AlignToHub/ErrorX", errors[0]);

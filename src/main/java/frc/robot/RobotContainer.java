@@ -192,7 +192,7 @@ public class RobotContainer {
             new JoystickButton(controller, 6)
             .whileTrue(DriveCommands.robotJoystickDrive(drive, -slowSpeed, 0, 0));
 
-            new JoystickButton(controller, 1).onTrue(Commands.runOnce(drive::scoreFuel, drive));
+            new JoystickButton(controller, 1).onTrue(Commands.runOnce(drive::scoreFuel));
 
             new JoystickButton(controller, 3)
                     .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
