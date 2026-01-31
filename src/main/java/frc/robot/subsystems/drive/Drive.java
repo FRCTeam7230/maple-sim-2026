@@ -38,7 +38,9 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -46,6 +48,8 @@ import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import frc.robot.subsystems.vision.Vision;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
@@ -56,7 +60,7 @@ import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Drive extends SubsystemBase {
+public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -235,6 +239,8 @@ public class Drive extends SubsystemBase {
       poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
+  
+
   /**
    * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
    * return to their normal orientations the next time a nonzero velocity is requested.
@@ -333,6 +339,11 @@ public ChassisSpeeds getChassisSpeeds() {
     return maxSpeedMetersPerSec;
   }
 
+  @Override
+  public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
+      poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+  }
+
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
@@ -362,30 +373,10 @@ public ChassisSpeeds getChassisSpeeds() {
       Degrees.of(70)));
     }
   }
-  public void shootWithVariance() {
-    if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
-    SimulatedArena.getInstance()
-    .addGamePieceProjectile(new RebuiltFuelOnFly(
-      // Obtain robot position from drive simulation
-      driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-      // The scoring mechanism 
-      new Translation2d(0.46, 0),
-      // Obtain robot speed from drive simulation
-      driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-      // Obtain robot facing from drive simulation
-      driveSimulation.getSimulatedDriveTrainPose().getRotation(),
-      // The height at which the fuel is ejected
-      Meters.of(2.1),
-      // The initial speed of the fuel
-      MetersPerSecond.of(0),
-      // The fuel is at 45degrees
-      Degrees.of(45)));
-    }
-  }
   public static double randomInRange(double variance) {
       return (Math.random() - 0.5) * variance;
   }
-  public void addPieceWithVariance(
+  public void shootWithVariance(
         Translation2d piecePose,
         Rotation2d yaw,
         Distance height,
@@ -420,11 +411,29 @@ public ChassisSpeeds getChassisSpeeds() {
         // The intake can hold up to 60 fuel
       60);
   }
-
+  public boolean hasFuelInIntake(){
+    return this.intakeSimulation.getGamePiecesAmount() > 0;
+  }
   public void intakeStop(){
     this.intakeSimulation.stopIntake();
   }
   public void intakeStart(){
     this.intakeSimulation.startIntake();
   }
+    // public void spamScore(){
+    //   Command score = new SequentialCommandGroup(
+    //     new InstantCommand(() -> scoreFuel()),
+    //     new WaitCommand(1)
+    //   ).repeatedly();
+
+    //     // int counter = 200;
+    //     // if (this.intakeSimulation.getGamePiecesAmount() > 0){
+    //     //   counter--;
+    //     //   if (counter <= 0){
+    //     //     scoreFuel();
+    //     //     counter = 200;
+    //     //   }
+    //     // }
+    // }
+    
 }
