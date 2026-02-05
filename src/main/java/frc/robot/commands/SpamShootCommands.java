@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
@@ -7,9 +8,14 @@ import frc.robot.subsystems.drive.Drive;
 public class SpamShootCommands extends Command{
     Drive robotDrive;
     Timer timer = new Timer();
-    public SpamShootCommands(Drive drive) {
+    boolean autoMode;
+
+    double timeRemaning = DriverStation.getMatchTime();
+    
+    public SpamShootCommands(Drive drive, boolean autoMode) {
         robotDrive = drive;
-        addRequirements(drive);
+        this.autoMode = autoMode;
+        //addRequirements(drive);
     }
     @Override 
     public void initialize(){
@@ -25,7 +31,7 @@ public class SpamShootCommands extends Command{
     }
     @Override
     public boolean isFinished(){
-        return !robotDrive.hasFuelInIntake();
+        return !robotDrive.hasFuelInIntake()||DriverStation.getMatchTime()<7&&DriverStation.getMatchTime()>0;
     }
     @Override
     public void end(boolean interrupted){

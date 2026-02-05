@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Path Part 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Fuel"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Path Part 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Path Part 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Megatag Align"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Path Part 3.1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Path Part 4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Path Part 5"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Bump Auto",
+  "choreoAuto": false
+}

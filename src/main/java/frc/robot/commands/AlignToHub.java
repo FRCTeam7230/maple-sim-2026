@@ -20,7 +20,7 @@ public class AlignToHub extends Command {
   PIDController xController = new PIDController(1, 0, 0);
   PIDController yController = new PIDController(1, 0, 0);
   PIDController rotController = new PIDController(0.03, 0, 0);
-
+  
   Command drivecommand = null;
   public AlignToHub(Drive drive) {
     m_drive = drive;
@@ -29,11 +29,16 @@ public class AlignToHub extends Command {
     rotController.setSetpoint(0);
     rotController.enableContinuousInput(-180, 180);
     // Use addRequirements() here to declare subsystem dependencies.
+    
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    SmartDashboard.putData("AlignToHub/xController", xController);
+    SmartDashboard.putData("AlignToHub/yController", yController);
+    SmartDashboard.putData("AlignToHub/rotController", rotController);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -43,6 +48,7 @@ public class AlignToHub extends Command {
     double xSpeed = xController.calculate(errors[0]);
     double ySpeed = yController.calculate(errors[1]);
     double rotSpeed = Math.max(Math.min(rotController.calculate(errors[2]),1.5), -1.5);
+    
     SmartDashboard.putNumber("Rotation delivered", rotSpeed);
     drivecommand = DriveCommands.joystickDrive(m_drive, ()->{return -xSpeed;}, ()->{return -ySpeed;},()->{return -rotSpeed;});
     drivecommand.execute();

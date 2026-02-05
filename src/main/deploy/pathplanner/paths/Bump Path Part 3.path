@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.855433734939759,
-        "y": 6.297036144578313
+        "x": 8.011226818830243,
+        "y": 6.202225392296718
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.200374092485299,
-        "y": 5.334469595412933
+        "x": 5.8163087832632785,
+        "y": 5.825713267420626
       },
       "isLocked": false,
-      "linkedName": "Neutral Shooting"
+      "linkedName": "Intake Endpoint"
     },
     {
       "anchor": {
-        "x": 1.0631669044222536,
-        "y": 4.584893009985735
+        "x": 5.538072289156627,
+        "y": 6.045698795180723
       },
       "prevControl": {
-        "x": 1.049945341669009,
-        "y": 4.834543145732468
+        "x": 5.774724831486405,
+        "y": 6.126293920398397
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Top clmb"
+      "linkedName": "Bump Auto Neutral Zone"
     }
   ],
   "rotationTargets": [],
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 0.0
+    "velocity": 0.2,
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Bump Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -43.668000000000006
+    "rotation": -89.27477570094071
   },
   "useDefaultConstraints": true
 }

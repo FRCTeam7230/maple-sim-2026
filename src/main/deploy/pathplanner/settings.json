@@ -3,9 +3,14 @@
   "robotLength": 0.61,
   "holonomicMode": true,
   "pathFolders": [
-    "Auto1"
+    "Auto1",
+    "Bump Paths",
+    "Intake Paths",
+    "Sabotage Autos"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Bump Auto"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

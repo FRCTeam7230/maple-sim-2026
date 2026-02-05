@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.DriveCommands;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -68,7 +70,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
-
+  
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
@@ -108,7 +110,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(
         this::getPose,
-        this::setPose,
+        //this::setPose,
+        this::resetOdometry,
         this::getChassisSpeeds,
         this::runVelocity,
         new PPHolonomicDriveController(
@@ -136,10 +139,13 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+          SmartDashboard.putNumber("Bump Speed", initSpeed);
   }
 
   @Override
   public void periodic() {
+    SmartDashboard.putData("Going over the bump", DriveCommands.joystickDrive(this,()-> initSpeed, ()->0, ()->0).withTimeout(2));
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -322,7 +328,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    ///resetSimulationPoseCallBack.accept(pose);
+        poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    //poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -352,8 +360,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   public void spawnFuel() {
       SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(driveSimulation.getSimulatedDriveTrainPose().getTranslation()));
   }
-
+  double initSpeed = 0;
   public void scoreFuel() {
+    
     if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
     SimulatedArena.getInstance()
     .addGamePieceProjectile(new RebuiltFuelOnFly(
@@ -364,11 +373,11 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
       // Obtain robot speed from drive simulation
       driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
       // Obtain robot facing from drive simulation
-      driveSimulation.getSimulatedDriveTrainPose().getRotation(),
+      driveSimulation.getSimulatedDriveTrainPose().getRotation(),//.plus(Rotation2d.fromDegrees(180)),
       // The height at which the fuel is ejected
       Meters.of(.38),
       // The initial speed of the fuel
-      MetersPerSecond.of(7),
+      MetersPerSecond.of(initSpeed),
       // The fuel is at 45degrees
       Degrees.of(70)));
     }
@@ -407,7 +416,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
         // The extension length of the intake beyond the robot's frame (when activated)
         Meters.of(0.2),
         // The intake is mounted on the back side of the chassis
-        IntakeSimulation.IntakeSide.FRONT,
+        IntakeSimulation.IntakeSide.BACK,
         // The intake can hold up to 60 fuel
       60);
   }

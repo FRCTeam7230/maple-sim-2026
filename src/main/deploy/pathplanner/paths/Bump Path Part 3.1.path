@@ -1,0 +1,68 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.538072289156627,
+        "y": 6.045698795180723
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.933520939708232,
+        "y": 6.005103915029626
+      },
+      "isLocked": false,
+      "linkedName": "Bump Auto Neutral Zone"
+    },
+    {
+      "anchor": {
+        "x": 3.5820120481927713,
+        "y": 5.980132530120482
+      },
+      "prevControl": {
+        "x": 4.710211067225467,
+        "y": 5.97173227819989
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Bump Auto Alliance Shoot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Bump Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
