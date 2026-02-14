@@ -8,22 +8,30 @@ import java.util.Optional;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import org.littletonrobotics.junction.Logger;
+
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlignToHub extends Command {
-  /** Creates a new AlignToHub. */
+  /* Creates a new AlignToHub. */
+
   Drive m_drive;
   PIDController xController = new PIDController(1, 0, 0);
   PIDController yController = new PIDController(1, 0, 0);
-  PIDController rotController = new PIDController(0.03, 0, 0.001);
+  PIDController rotController = new PIDController(0.07, 0, 0.002);
 
   private final GenericHID controller = new GenericHID(0);
-  double speedMult = 0.6;
+  double speedMult = 0.5;
   double globalTargetAngle;
 
   Command drivecommand = null;
@@ -71,60 +79,144 @@ public class AlignToHub extends Command {
   public boolean isFinished() {
     return false;
   }
-    public double[] CalculateHubPID(Pose2d pose) {
-        double robotX = pose.getX();
-		    double robotY = pose.getY();
 
-        double[] errors = new double[3];
-        double radius = 2.75;
-        double hubY = 4.03; // meters
-        double hubXBlue = 4.63;
-        double hubXRed = 11.92;
-        double hubX;
-        if (DriverStation.getAlliance() == Optional.of(DriverStation.Alliance.Blue)) {
-            hubX = hubXBlue;
-        }
-        else {
-            hubX = hubXRed;
-        }
+  //constants
+  double radius = 2.75;
+  double hubY = 4.03; // meters
+  double hubXBlue = 4.63;
+  double hubXRed = 11.92;
+  double shooterOffset = .46; //meters
+  double initialEjectionVelocityBeforeOffset = 7; //m/s
+  double initialEjectionVelocityAfterOffset; //m/s
+  double ejectionAngle = 68; //deg
 
+  //declarations for scope
+  double timeOfFlight;
+  double zInitialVelocityRobotRelative = 0;
+  public static double globalAngleOffsetRad = 0; // when commands ends need to set this to 0
+  public static void setGlobalAngleOffsetRad0() {
+    globalAngleOffsetRad = 0;
+  }
 
-        double distanceX = hubX - robotX;
-        double distanceY = hubY - robotY;
-        double distance = Math.sqrt( Math.pow( distanceX, 2) + Math.pow( distanceY, 2) );
+  //sx constants and delcarations
+  double x0 = shooterOffset;
+  double vx0;
+  double ax = 0;
 
+  /*sy constants and delcarations. not used
+  double y0 = 0.38; //initial height.
+  double vy0 = initialEjectionVelocity*Math.sin(Math.toRadians(ejectionAngle));
+  double ay = -9.81;
+  */
 
-        double errorX = distanceX * ( (distance - radius) / distance );
-        double errorY = distanceY * ( (distance - radius) / distance );
-        double targetAngle = Math.signum(distanceY) * Math.toDegrees(Math.acos(distanceX / distance));
-        globalTargetAngle = targetAngle;
-        double errorAngle = targetAngle - pose.getRotation().getDegrees();
+  //sz constants and delcarations
+  double z0 = 0;
+  double az = 0; //ignoring any horizontal accelerations for now
 
-        double shooterOffset = .46; //meters
-        double initialEjectionVelocity = 6.5; //m/s
-        double ejectionAngle = 68; //deg
+  public double[] CalculateHubPID(Pose2d pose) {
+      double robotX = pose.getX();
+		  double robotY = pose.getY();
 
-        double timeOfFlight = (radius - shooterOffset)/(initialEjectionVelocity*Math.cos(Math.toRadians(ejectionAngle)));
-        double initialVelocityRobotRelative = m_drive.getChassisSpeeds().vyMetersPerSecond;
+      //error calculations
+      double[] errors = new double[3];
+        
+      double hubX;
+      if (DriverStation.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
+          hubX = hubXBlue;
+          
+      }
+      else {
+          hubX = hubXRed;
+      }
 
-        double angleOffset = Math.toDegrees(Math.atan(initialVelocityRobotRelative * timeOfFlight/radius));
-        SmartDashboard.putNumber("AlignToHub/ErrorX", errors[0]);
+      double distanceX = hubX - robotX;
+      double distanceY = hubY - robotY;
+      double distance = Math.sqrt( Math.pow( distanceX, 2) + Math.pow( distanceY, 2) );
 
-		    errors[0] = errorX;
-		    errors[1] = errorY;
-		    errors[2] = errorAngle - (1*angleOffset);
+      double errorX = distanceX * ( (distance - radius) / distance );
+      double errorY = distanceY * ( (distance - radius) / distance );
 
+      double targetAngle = Math.signum(distanceY) * Math.toDegrees(Math.acos(distanceX / distance));
+      globalTargetAngle = targetAngle;
+      double errorAngle = targetAngle - pose.getRotation().getDegrees();
 
-       SmartDashboard.putNumber("AlignToHub/TargetAngle",targetAngle);
+      //angle offset calculations
+      initialEjectionVelocityAfterOffset = initialEjectionVelocityBeforeOffset;// + Math.abs(0.1*zInitialVelocityRobotRelative);
+      m_drive.setInitialVelocity(initialEjectionVelocityAfterOffset);
+      vx0 = initialEjectionVelocityBeforeOffset*Math.cos(Math.toRadians(ejectionAngle));
 
-        SmartDashboard.putNumber("AlignToHub/ErrorX", errors[0]);
-        SmartDashboard.putNumber("AlignToHub/ErrorY", errors[1]);
-        SmartDashboard.putNumber("AlignToHub/ErrorAngle", errors[2]);
+      timeOfFlight = (radius - x0)/(initialEjectionVelocityBeforeOffset*Math.cos(Math.toRadians(ejectionAngle)));
+      zInitialVelocityRobotRelative = m_drive.getChassisSpeeds().vyMetersPerSecond;
 
-       SmartDashboard.putNumber("AlignToHub/RobotX", robotX);
-        SmartDashboard.putNumber("AlignToHub/RobotY", robotY);
-        SmartDashboard.putNumber("AlignToHub/RobotAngle", pose.getRotation().getDegrees());
-        return errors;
+      //super old offset calc
+      //double angleOffsetRad = (Math.atan(zInitialVelocityRobotRelative * timeOfFlight/radius)); 
+
+      //new offset calc
+      
+      double t1 = timeOfFlight; //time of normal trajectory from shooter to hub
+      double theta2Rad = (Math.atan( (sz(t1)) / (radius - shooterOffset) )); //rad
+
+      double x0New = shooterOffset * Math.cos((theta2Rad));
+      double t2 = (radius - x0New) / ( (vx0 * Math.cos((theta2Rad))) + (zInitialVelocityRobotRelative * Math.sin(theta2Rad)) );
+      double theta3Rad = (Math.atan( (szNew(t2,theta2Rad)) / ( (sxNew(t2,theta2Rad)) - x0New) )); //rad
+
+      double angleOffsetRad = theta2Rad + theta3Rad; // rad. idk if add or sub. pretty sure add
+      globalAngleOffsetRad = angleOffsetRad;
+
+		  errors[0] = errorX;
+		  errors[1] = errorY;
+		  errors[2] = errorAngle - Math.toDegrees(angleOffsetRad); //deg
+
+      //offset calc publisher 
+      
+      SmartDashboard.putNumber("AlignToHub/theta2Deg", Math.toDegrees(theta2Rad));
+      SmartDashboard.putNumber("AlignToHub/theta3Deg", Math.toDegrees(theta3Rad));
+      SmartDashboard.putNumber("AlignToHub/angleOffset", Math.toDegrees(angleOffsetRad));
+      SmartDashboard.putNumber("AlignToHub/zInitialVelocity", zInitialVelocityRobotRelative);
+      SmartDashboard.putNumber("AlignToHub/initalEjectionVelocity", initialEjectionVelocityAfterOffset);
+      
+      //error publisher
+      SmartDashboard.putNumber("AlignToHub/ErrorX", errors[0]);
+      SmartDashboard.putNumber("AlignToHub/TargetAngle",targetAngle);
+      SmartDashboard.putNumber("AlignToHub/ErrorX", errors[0]);
+      SmartDashboard.putNumber("AlignToHub/ErrorY", errors[1]);
+      SmartDashboard.putNumber("AlignToHub/ErrorAngle", errors[2]);
+
+      //robot pos publisher
+      SmartDashboard.putNumber("AlignToHub/RobotX", robotX);
+      SmartDashboard.putNumber("AlignToHub/RobotY", robotY);
+      SmartDashboard.putNumber("AlignToHub/RobotAngle", pose.getRotation().getDegrees());
+      SmartDashboard.putBoolean("AlignToHub/Alliance", DriverStation.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue)));
+
+      return errors;
     }
+    ///* 
+    private double sx(double t) {
+      return x0 + vx0*t + .5*ax*Math.pow(t,2);
+    }
+    
+    private double sz(double t) {
+      return z0 + zInitialVelocityRobotRelative*t + .5*az*Math.pow(t,2);
+    }
+      //*/
+    private double sxNew(double t, double theta) { //angle in rad
+      return sx(t)*Math.cos((theta)) + sz(t)*Math.sin((theta)); //applies rotation about y-axis by angle theta
+    }
+    private double szNew(double t, double theta) { //angle in rad
+      return sz(t)*Math.cos((theta)) - sx(t)*Math.sin((theta)); //applies rotation about y-axis by angle theta
+    }
+    /* //not used
+    private double sy(double t) { 
+      return y0 + vy0*t + .5*ay*Math.pow(t,2);
+    }*/
+    /*//try these later but probably dont need to - NEED TO MAKE globalAngleOffsetRad = 0 WHEN ALIGN COMMAND ENDS --> CHECK
+    private double sx(double t) {
+      return x0 + (Math.sin(globalAngleOffsetRad)*zInitialVelocityRobotRelative + vx0)*t + .5*ax*Math.pow(t,2);
+    }
+    private double sz(double t) {
+      return z0 + zInitialVelocityRobotRelative*t + .5*az*Math.pow(t,2);
+    }
+    */
+
 }
 

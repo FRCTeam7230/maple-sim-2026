@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,6 +46,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.util.LocalADStarAK;
+
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -353,7 +356,12 @@ public ChassisSpeeds getChassisSpeeds() {
       SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(driveSimulation.getSimulatedDriveTrainPose().getTranslation()));
   }
 
+  double velocity;
+  public void setInitialVelocity(double v) {
+    velocity = v;
+  }
   public void scoreFuel() {
+    SmartDashboard.putNumber("Drive/velocity",velocity);
     if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
     SimulatedArena.getInstance()
     .addGamePieceProjectile(new RebuiltFuelOnFly(
