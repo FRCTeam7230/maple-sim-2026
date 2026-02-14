@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlignToHub;
 import frc.robot.commands.DriveCommands;
-// import frc.robot.commands.SpamShootCommands;
+import frc.robot.commands.SpamShootCommands;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
@@ -202,10 +202,10 @@ public class RobotContainer {
         // new JoystickButton(controller, 2)
         //         .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         drive.intakeStart();
-        // new JoystickButton(controller, 1)
-        //         .onTrue(
-        //                     new SpamShootCommands(drive)
-        //         );
+        new JoystickButton(controller, 1)
+                .onTrue(
+                            new SpamShootCommands(drive)
+                );
        // Arena2026Rebuilt a = SimulatedArena.getInstance();
 
             new JoystickButton(controller, /*change*/3)
