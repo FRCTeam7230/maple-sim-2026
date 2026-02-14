@@ -415,7 +415,7 @@ public ChassisSpeeds getChassisSpeeds() {
         // The extension length of the intake beyond the robot's frame (when activated)
         Meters.of(0.2),
         // The intake is mounted on the back side of the chassis
-        IntakeSimulation.IntakeSide.FRONT,
+        IntakeSimulation.IntakeSide.BACK,
         // The intake can hold up to 60 fuel
       60);
   }

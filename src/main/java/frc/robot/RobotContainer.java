@@ -207,7 +207,7 @@ public class RobotContainer {
                     () -> controller.getRawAxis(0) * speedMult, 
                     () -> -controller.getRawAxis(2) * rotMult));
             
-            new JoystickButton(controller, 11).whileTrue(DriveCommands.toggleDrive());
+            new JoystickButton(controller, 10).onTrue(DriveCommands.toggleDrive());
 
 
             new JoystickButton(controller, 5)

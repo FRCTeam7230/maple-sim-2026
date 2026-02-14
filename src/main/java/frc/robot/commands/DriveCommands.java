@@ -62,11 +62,7 @@ public class DriveCommands {
       public static Command toggleDrive(){
             return Commands.sequence(
                     Commands.runOnce(() -> {
-                            if (IS_FIELD_RELATIVE){
-                                    IS_FIELD_RELATIVE = false;
-                            }else{
-                                    IS_FIELD_RELATIVE = true;
-                            }
+                            IS_FIELD_RELATIVE = !IS_FIELD_RELATIVE;
                     }),
                     Commands.waitSeconds(1)
             );
