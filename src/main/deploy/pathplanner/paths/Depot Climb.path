@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.047985109221121,
-        "y": 4.526763019661658
+        "x": 1.0178423279453703,
+        "y": 4.551441126372985
       },
       "isLocked": false,
       "linkedName": "Depot Shooting"
     },
     {
       "anchor": {
-        "x": 1.0631669044222536,
-        "y": 4.584893009985735
+        "x": 1.0372895863052778,
+        "y": 4.533138373751783
       },
       "prevControl": {
-        "x": 1.3462469055071151,
-        "y": 4.9200006202207796
+        "x": 1.4357777699947172,
+        "y": 4.858719067958723
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 177.56335175318995
   },
   "reversed": false,
   "folder": null,

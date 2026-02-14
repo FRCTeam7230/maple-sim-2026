@@ -3,71 +3,71 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.0796433666191145,
-        "y": 3.0840085592011417
+        "x": 8.20530670470756,
+        "y": 6.1245934379457925
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.440390631550084,
-        "y": 1.8194414916156383
+        "x": 8.566292656425306,
+        "y": 6.139812712567318
       },
       "isLocked": false,
-      "linkedName": "bneutral zone 2"
+      "linkedName": "Top Neutral Zone intake end"
     },
     {
       "anchor": {
-        "x": 6.769355555555555,
-        "y": 0.4490444444444438
+        "x": 5.759900142653351,
+        "y": 5.775249643366619
       },
       "prevControl": {
-        "x": 7.107648446425853,
-        "y": 0.4305544779350713
+        "x": 7.098691369768991,
+        "y": 6.388002878322156
       },
       "nextControl": {
-        "x": 2.272349892745189,
-        "y": 0.6948358469297593
+        "x": 5.344180499501659,
+        "y": 5.584978336671122
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.144422222222222,
-        "y": 0.6244444444444435
+        "x": 3.663837375178317,
+        "y": 5.64586305278174
       },
       "prevControl": {
-        "x": 3.967487762926004,
-        "y": 0.5340466238487599
+        "x": 5.071754329185346,
+        "y": 5.7208255666273615
       },
       "nextControl": {
-        "x": 2.7953130945745035,
-        "y": 0.6627873256959523
+        "x": 3.115976764025136,
+        "y": 5.616693002281137
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.839486447931526,
-        "y": 2.2041797432239663
+        "x": 1.9818116975748925,
+        "y": 5.374151212553495
       },
       "prevControl": {
-        "x": 2.8306485943765427,
-        "y": 1.8966473379341897
+        "x": 1.7647605232264443,
+        "y": 5.498202765199802
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "BNeutral Shooting"
+      "linkedName": "Neutral Shooting"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.1087866108786668,
-      "rotationDegrees": -67.98981263505114
+      "waypointRelativePos": 1.0251046025104589,
+      "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 1.9344490934449183,
-      "rotationDegrees": -115.93085533510417
+      "waypointRelativePos": 2.0013947001394508,
+      "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [],
@@ -83,13 +83,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 32.4123066183512
+    "rotation": 134.99999999999997
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 178.56790381583528
+    "rotation": -91.36392753160274
   },
   "useDefaultConstraints": true
 }

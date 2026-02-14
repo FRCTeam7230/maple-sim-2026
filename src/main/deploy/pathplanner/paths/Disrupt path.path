@@ -112,12 +112,12 @@
     },
     {
       "anchor": {
-        "x": 1.855433734939759,
-        "y": 6.297036144578313
+        "x": 1.9818116975748925,
+        "y": 5.374151212553495
       },
       "prevControl": {
-        "x": 2.140007681351628,
-        "y": 7.043432564384571
+        "x": 2.266385643986762,
+        "y": 6.120547632359753
       },
       "nextControl": null,
       "isLocked": false,
@@ -158,10 +158,10 @@
   },
   "goalEndState": {
     "velocity": 1.0,
-    "rotation": -43.668000000000006
+    "rotation": 134.99999999999997
   },
   "reversed": false,
-  "folder": "Sabotage Autos",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0.0,
     "rotation": 0.0

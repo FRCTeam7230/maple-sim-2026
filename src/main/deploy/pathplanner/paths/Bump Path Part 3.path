@@ -45,7 +45,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Bump Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": -89.27477570094071

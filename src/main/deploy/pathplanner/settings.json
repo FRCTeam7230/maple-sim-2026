@@ -3,14 +3,9 @@
   "robotLength": 0.61,
   "holonomicMode": true,
   "pathFolders": [
-    "Auto1",
-    "Bump Paths",
-    "Intake Paths",
-    "Sabotage Autos"
+    "Auto1"
   ],
-  "autoFolders": [
-    "Bump Auto"
-  ],
+  "autoFolders": [],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
@@ -22,7 +17,7 @@
   "driveWheelRadius": 0.048,
   "driveGearing": 5.143,
   "maxDriveSpeed": 5.45,
-  "driveMotorType": "krakenX60",
+  "driveMotorType": "NEO",
   "driveCurrentLimit": 60.0,
   "wheelCOF": 1.2,
   "flModuleX": 0.273,
@@ -35,5 +30,16 @@
   "brModuleY": -0.273,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"Circle\",\"type\":\"circle\",\"data\":{\"center\":{\"x\":0.17,\"y\":-0.15},\"radius\":0.05,\"strokeWidth\":0.05,\"filled\":false}}",
+    "{\"name\":\"Circle\",\"type\":\"circle\",\"data\":{\"center\":{\"x\":0.17,\"y\":0.15},\"radius\":0.05,\"strokeWidth\":0.05,\"filled\":false}}",
+    "{\"name\":\"Line\",\"type\":\"line\",\"data\":{\"start\":{\"x\":0.0,\"y\":0.1},\"end\":{\"x\":0.15,\"y\":0.0},\"strokeWidth\":0.03}}",
+    "{\"name\":\"Line\",\"type\":\"line\",\"data\":{\"start\":{\"x\":0.0,\"y\":0.11},\"end\":{\"x\":0.0,\"y\":-0.05},\"strokeWidth\":0.03}}",
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.1,\"y\":0.385},\"size\":{\"width\":0.1,\"length\":0.22},\"borderRadius\":0.5,\"strokeWidth\":0.02,\"filled\":false}}",
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.1,\"y\":-0.385},\"size\":{\"width\":0.1,\"length\":0.22},\"borderRadius\":0.5,\"strokeWidth\":0.02,\"filled\":false}}",
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.32,\"y\":0.0},\"size\":{\"width\":0.7,\"length\":0.1},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":true}}",
+    "{\"name\":\"Line\",\"type\":\"line\",\"data\":{\"start\":{\"x\":0.28,\"y\":0.15},\"end\":{\"x\":0.2,\"y\":0.03},\"strokeWidth\":0.02}}",
+    "{\"name\":\"Line\",\"type\":\"line\",\"data\":{\"start\":{\"x\":0.28,\"y\":-0.15},\"end\":{\"x\":0.2,\"y\":-0.03},\"strokeWidth\":0.02}}",
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":-0.15,\"y\":0.0},\"size\":{\"width\":0.5,\"length\":0.18},\"borderRadius\":0.5,\"strokeWidth\":0.04,\"filled\":false}}"
+  ]
 }
