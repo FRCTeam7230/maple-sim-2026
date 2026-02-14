@@ -32,4 +32,7 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+  public static class LimelightConstants {
+    public static final double maxVisionDistanceMeters = 4.0; // maximum distance to accept vision measurements
+  }
 }

@@ -12,13 +12,15 @@ import static frc.robot.subsystems.drive.DriveConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,9 +49,15 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.DriveCommands;
 import frc.robot.util.LocalADStarAK;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+
+import frc.robot.subsystems.LimelightHelpers;
 import frc.robot.subsystems.vision.Vision;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -61,6 +69,8 @@ import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import frc.robot.util.PPHolonomicDriveControllerCustom;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   static final Lock odometryLock = new ReentrantLock();
@@ -86,7 +96,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   public SwerveDriveSimulation driveSimulation;
   private IntakeSimulation intakeSimulation;
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
-  
+  PIDController xController;
+  PIDController yController;
+  PIDController rotController;
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -140,12 +152,21 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
-          SmartDashboard.putNumber("Bump Speed", initSpeed);
+  double rotP = 5.0;
+    double rotI = 0.0;
+    double rotD = 0.0;
+        //Megatag stuff
+      PPHolonomicDriveControllerCustom autoDriveController = new PPHolonomicDriveControllerCustom(
+        new PIDConstants(5.0, 0.0, 0.0),
+        new PIDConstants(rotP, rotI, rotD));
+
+    xController = autoDriveController.getXController();
+    yController = autoDriveController.getYController();
+    rotController = autoDriveController.getRotationController();
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putData("Going over the bump", DriveCommands.joystickDrive(this,()-> initSpeed, ()->0, ()->0).withTimeout(2));
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -197,10 +218,13 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+
+      //addVisionMeasurement(poseEstimator, VecBuilder.fill(0.1, 0.1, 0.1));
     }
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+    //updateMegatag();
   }
 
   /**
@@ -360,9 +384,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   public void spawnFuel() {
       SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(driveSimulation.getSimulatedDriveTrainPose().getTranslation()));
   }
-  double initSpeed = 0;
+
   public void scoreFuel() {
-    
     if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
     SimulatedArena.getInstance()
     .addGamePieceProjectile(new RebuiltFuelOnFly(
@@ -377,7 +400,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
       // The height at which the fuel is ejected
       Meters.of(.38),
       // The initial speed of the fuel
-      MetersPerSecond.of(initSpeed),
+      MetersPerSecond.of(7),
       // The fuel is at 45degrees
       Degrees.of(70)));
     }
@@ -444,5 +467,92 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
     //     //   }
     //     // }
     // }
+    Integer[] IDFilter;
+    Pose2d currentPose;
+    public void ApplyMegatagFilter()
+  {
+    Optional<Alliance> ally = DriverStation.getAlliance();
+    if (ally.isPresent()) {
+      if (ally.get() == Alliance.Red) {
+        IDFilter = new Integer[]{ 2, 5, 8, 9, 10, 11 };
+      }
+      if (ally.get() == Alliance.Blue) {
+        IDFilter = new Integer[]{ 18, 21, 24, 25, 26, 27 };
+      }
+    } else {
+      IDFilter = new Integer[]{ 2, 5, 8, 9, 10, 11, 18, 21, 24, 25, 26, 27 };
+    }
+  }
+  public void CancelMegatagFilter()
+  {
+    IDFilter = null;
+  }
+  public void updateMegatag() {
+    // currentPose = m_odometry.update(
+    //     Rotation2d.fromDegrees(getFieldAngle()),
+    //     new SwerveModulePosition[] {
+    //         m_frontLeft.getPosition(),
+    //         m_frontRight.getPosition(),
+    //         m_rearLeft.getPosition(),
+    //         m_rearRight.getPosition()
+    //     });
+    resetOdometry(getPose());//This makes the odometry update to the current pose in sim. Not sure if that updates the odometry to the sim's position or update the sim's position to the odometry.
+    currentPose = getPose();
+    poseEstimator.update(gyroInputs.yawPosition, new SwerveModulePosition[] {
+        modules[0].getPosition(),
+        modules[1].getPosition(),
+        modules[2].getPosition(),
+        modules[3].getPosition()
+    });
+    boolean doRejectUpdate = false;
+
+    LimelightHelpers.SetRobotOrientation("Camera 0", getPose().getRotation().getDegrees(), 0,
+        0, 0, 0, 0);
     
+    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("Camera 0");
+    ArrayList<Integer> validIDList = new ArrayList<Integer>();
+    for (LimelightHelpers.RawFiducial distanceFiducial : mt2.rawFiducials) {
+      if (distanceFiducial.distToRobot < Constants.LimelightConstants.maxVisionDistanceMeters) {
+        if(IDFilter == null || Arrays.asList(IDFilter).contains(distanceFiducial.id))
+        validIDList.add(distanceFiducial.id);
+      }
+    }
+    int[] validIds = validIDList.stream().mapToInt(i -> i).toArray();
+    LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIds);
+    mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+
+    if (Math.abs(gyroInputs.yawVelocityRadPerSec*180/Math.PI) > 720) // if our angular velocity is greater than 720 degrees per second, ignore
+                                          // vision updates
+    {
+      doRejectUpdate = true;
+    }
+    if (mt2.tagCount == 0) {
+      doRejectUpdate = true;
+    }
+    if (!doRejectUpdate) {
+      accept(mt2.pose, mt2.timestampSeconds, VecBuilder.fill(.7, .7, 9999999));
+      // m_odometry.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+      // m_odometry.addVisionMeasurement(
+      //     mt2.pose,
+      //     mt2.timestampSeconds);
+      
+    }
+
+    // double[] gyroData = { (double) m_gyro.getYaw(),
+    //     m_gyro.getAngle(), (double) m_gyro.getRoll(),
+    //     (double) m_gyro.getPitch() };
+    // double[] gyroData = { (double)  gyroInputs.yawPosition.getDegrees(),
+    //     m_gyro.getAngle(), (double) gyroInputs.rollPosition.getDegrees(),
+    //     (double) m_gyro.getPitch() };
+
+    //     SmartDashboard.putNumberArray("Gyro Data", gyroData);
+    //gyro_publisher.set(gyroData);
+    //gyro_calibrated.set(m_gyro.isCalibrating());
+    //odomPublisher.set(currentPose);
+
+    double[] errors = { xController.getError(), yController.getError(), rotController.getError() };
+
+    //error_publisher.set(errors);
+    SmartDashboard.putNumberArray("errors", errors);
+  }
 }

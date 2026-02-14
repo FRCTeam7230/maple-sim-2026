@@ -113,6 +113,18 @@ public class DriveCommands {
         },
         drive);
   }
+  public static double speedMult = 1;
+  public static Command customJoystickDrive(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier
+  ){
+    return joystickDrive(drive, ()->xSupplier.getAsDouble()*speedMult, ()->ySupplier.getAsDouble()*speedMult, ()->omegaSupplier.getAsDouble()*speedMult);
+  }
+  public static void updateCustomSpeedMult(double newMult){
+    speedMult = newMult;
+  }
 
   public static Command robotJoystickDrive(
                   Drive drive, double xSupplier, double ySupplier, double omegaSupplier) {

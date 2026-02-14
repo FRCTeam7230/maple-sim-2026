@@ -1,0 +1,65 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.2960627674750356,
+        "y": 4.804850213980028
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.146709830550035,
+        "y": 4.562414200519748
+      },
+      "isLocked": false,
+      "linkedName": "Neutral Shooting 3"
+    },
+    {
+      "anchor": {
+        "x": 1.0631669044222536,
+        "y": 4.584893009985735
+      },
+      "prevControl": {
+        "x": 1.1926645253296186,
+        "y": 4.921749024188316
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Top clmb"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [
+    {
+      "fieldPosition": {
+        "x": 0.0,
+        "y": 4.0
+      },
+      "rotationOffset": 0.0,
+      "minWaypointRelativePos": 0.43051643192487926,
+      "maxWaypointRelativePos": 0.45,
+      "name": "Point Towards Zone"
+    }
+  ],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Bump Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -11.741368442452806
+  },
+  "useDefaultConstraints": true
+}

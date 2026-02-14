@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,7 +36,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AlignToBump;
+import frc.robot.commands.AlignToBump2;
 import frc.robot.commands.AlignToHub;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SpamShootCommands;
@@ -44,7 +46,7 @@ import frc.robot.util.AIRobotInSimulation;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
-import java.util.function.Supplier;
+import java.util.Optional;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -66,7 +68,7 @@ public class RobotContainer {
     private final Vision vision;
 
     // Controller
-    private final Boolean controllerMode = false;
+    private final Boolean controllerMode = true;
     private final GenericHID controller = new GenericHID(0);
 
     // Dashboard inputs
@@ -140,6 +142,7 @@ public class RobotContainer {
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
                 break;
         }
+        drive.initalizeIntake();
         NamedCommands.registerCommand("Shoot", new SpamShootCommands(drive, true));
         NamedCommands.registerCommand("Intake Fuel", 
                 Commands.runOnce(drive::intakeStart, drive)
@@ -163,21 +166,22 @@ public class RobotContainer {
         
         
         configureButtonBindings();
+
         
-        drive.initalizeIntake();
     }
 
-    
 
     /**
      * Use this method to define your button->command mappings. Buttons can be created by instantiating a
      * {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
-    private void configureButtonBindings() {
-        double slowSpeed = 0.4;
+    double slowSpeed = 0.4;
         double speedMult = 0.75;
         double rotMult = 0.65;
+    private void configureButtonBindings() {
+        double slowSpeed = 0.4;
+
                 
         new JoystickButton(controller, 4)
         .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, -slowSpeed, 0));
@@ -208,36 +212,31 @@ public class RobotContainer {
 
         if(controllerMode){
             drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getRawAxis(1)*speedMult, () -> -controller.getRawAxis(0)*speedMult, () -> controller.getRawAxis(4)*rotMult)
+                drive, () -> controller.getRawAxis(1)*speedMult, () -> controller.getRawAxis(0)*speedMult, () -> -controller.getRawAxis(4)*rotMult)
                 );
             
-            new JoystickButton(controller, 10)
-            .onTrue(
-                Commands.runOnce(()-> {
-                        drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getRawAxis(1)*0.01, () -> -controller.getRawAxis(0)*0.01, () -> controller.getRawAxis(4)*rotMult))
-                ;}, drive).alongWith(
-                                new AlignToBump(drive)
-                )
-            ).onFalse(
-            Commands.runOnce(()-> {
-                drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getRawAxis(1)*speedMult, () -> -controller.getRawAxis(0)*speedMult, () -> controller.getRawAxis(4)*rotMult))
-            ;}, drive)
-                );
+            
             
             new JoystickButton(controller, /*change*/1)
                 .onTrue(
                         Commands.runOnce(drive::intakeStart, drive)
                 );
-            new JoystickButton(controller, /*change*/2)
+            new JoystickButton(controller, /*change*/3)
                 .onTrue(
                         Commands.runOnce(drive::intakeStop, drive)
                 );
+                new JoystickButton(controller, /*change*/6)
+                .onTrue(
+                        new AlignToHub(drive)
+                );
+                new JoystickButton(controller, /*change*/5)
+                .onTrue(
+                        new AlignToBump2(drive, controller)
+                );
             // fix this to a pov, povDown GenericHID
-            new JoystickButton(controller, /*change*/2)
-                .whileTrue(DriveCommands.toggleDrive().alongWith(Commands.run(() -> controller.setRumble(
-                        RumbleType.kBothRumble, 0.5)))); //toggle Field Relative
+        //     new JoystickButton(controller, /*change*/2)
+        //         .whileTrue(DriveCommands.toggleDrive().alongWith(Commands.run(() -> controller.setRumble(
+        //                 RumbleType.kBothRumble, 0.5)))); //toggle Field Relative
         // new JoystickButton(controller, 2)
         //         .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         drive.intakeStart();
@@ -247,47 +246,58 @@ public class RobotContainer {
                 );
        // Arena2026Rebuilt a = SimulatedArena.getInstance();
 
-            new JoystickButton(controller, /*change*/3)
-                .onTrue(
-                        Commands.runOnce(drive::spawnFuel, drive)
-                );
+        //     new JoystickButton(controller, /*change*/3)
+        //         .onTrue(
+        //                 Commands.runOnce(drive::spawnFuel, drive)
+        //         );
 
-            new JoystickButton(controller, /*change*/5) 
-                .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, slowSpeed, 0));
+        //     new JoystickButton(controller, /*change*/5) 
+        //         .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, slowSpeed, 0));
                     
-            new JoystickButton(controller, /*change*/6)
-                .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, -slowSpeed, 0));
+        //     new JoystickButton(controller, /*change*/6)
+        //         .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, -slowSpeed, 0));
 
 
-            new Trigger(() -> controller.getRawAxis(/*change*/3) > 0.5)
-                .onTrue(
-                        Commands.runOnce(drive::scoreFuel, drive)
-                );
+        //     new Trigger(() -> controller.getRawAxis(/*change*/3) > 0.5)
+        //         .onTrue(
+        //                 Commands.runOnce(drive::scoreFuel, drive)
+        //         );
             
                 
 
-            new JoystickButton(controller, 9) //press Rjoystick for reset gyro
+            new JoystickButton(controller, 8) //press Rjoystick for reset gyro
                     .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         } else {
             // if we aren't using controller
-            drive.setDefaultCommand(DriveCommands.joystickDrive(
+        //     drive.setDefaultCommand(DriveCommands.joystickDrive(
+        //             drive, 
+        //             () -> controller.getRawAxis(1) * speedMult, 
+        //             () -> controller.getRawAxis(0) * speedMult, 
+        //             () -> -controller.getRawAxis(2) * rotMult));
+        drive.setDefaultCommand(
+                DriveCommands.joystickDrive(
                     drive, 
                     () -> controller.getRawAxis(1) * speedMult, 
                     () -> controller.getRawAxis(0) * speedMult, 
-                    () -> -controller.getRawAxis(2) * rotMult));
-            new JoystickButton(controller, 10)
-            .onTrue(
-                Commands.runOnce(()-> {
-                        drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getRawAxis(1)*0.01, () -> -controller.getRawAxis(0)*0.01, () -> controller.getRawAxis(4)*rotMult))
-                ;}, drive)
-            ).onFalse(
-            Commands.runOnce(()-> {
-                drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getRawAxis(1)*speedMult, () -> -controller.getRawAxis(0)*speedMult, () -> controller.getRawAxis(4)*rotMult))
-            ;}, drive)
-                );
+                    () -> -controller.getRawAxis(2) * rotMult)
+        );
+        //DriveCommands.updateCustomSpeedMult(1);
+
+            Command goOverBump = DriveCommands.joystickDrive(drive,
+                        () -> DriverStation.getAlliance().equals(Optional.of(Alliance.Blue))?
+                        (drive.getPose().getX()<4.626?speedMult:-speedMult):
+                        (drive.getPose().getX()<11.915?speedMult:-speedMult),() -> 0, () -> 0);
+        //         Command alignToBump = new AlignToBump2(drive);
+                
+        //     new JoystickButton(controller, 10).onTrue(alignToBump);
+           // Commands.runOnce(()-> {DriveCommands.updateCustomSpeedMult(0.5);}, drive)
+                //.alongWith(alignToBump)//.andThen(goOverBump)
+        //     ).onFalse(
+        //         //Commands.runOnce(()->alignToBump.cancel()).andThen(
+        //        Commands.runOnce(
+        //         ()-> {speedMult=1;}, drive));
+
             new JoystickButton(controller, 11).whileTrue(DriveCommands.toggleDrive());
 
 
@@ -305,7 +315,7 @@ public class RobotContainer {
                         Commands.runOnce(drive::intakeStart, drive)
                 );
             new JoystickButton(controller, 2).whileTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true).andThen(new AlignToHub(drive)));
-
+               
         }
     }
 
@@ -337,7 +347,4 @@ public class RobotContainer {
         Logger.recordOutput(
                 "FieldSimulation/AlliancePartnerRobotPositions", AIRobotInSimulation.getAlliancePartnerRobotPoses());
     }
-    
-
-        
 }

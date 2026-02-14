@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Align To Bump"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Path Part 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Path Part 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Align To Bump"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Path Part 4"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Bump Auto",
+  "choreoAuto": false
+}

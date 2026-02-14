@@ -17,9 +17,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Bump Path Part 2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Bump Path Part 2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "UpdateOdometry"
+                }
+              }
+            ]
           }
         },
         {
@@ -41,9 +54,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Bump Path Part 4"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Bump Path Part 4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "UpdateOdometry"
+                }
+              }
+            ]
           }
         },
         {
