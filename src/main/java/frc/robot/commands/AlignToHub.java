@@ -81,7 +81,7 @@ public class AlignToHub extends Command {
         double hubXBlue = 4.63;
         double hubXRed = 11.92;
         double hubX;
-        if (DriverStation.getAlliance() == Optional.of(DriverStation.Alliance.Blue)) {
+        if (DriverStation.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
             hubX = hubXBlue;
         }
         else {

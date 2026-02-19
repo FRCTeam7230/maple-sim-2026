@@ -6,35 +6,28 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 
 public class AlignToBump extends Command{
-    PIDController rotController = new PIDController(0.3, 0, 0);
+    PIDController rotController = new PIDController(0.03, 0, 0);
     Drive drive;
     double error;
-    boolean isRunning = false;
     public AlignToBump(Drive drive) {
-        rotController.enableContinuousInput(-180, 180);
         rotController.setSetpoint(0);//This makes the robot face 0 degrees.
+        rotController.enableContinuousInput(-180, 180);
         this.drive = drive;
     }
     @Override
     public void initialize() {
         SmartDashboard.putData("AlignToBump/rotController", rotController);
-        //SmartDashboard.putBoolean("AlignToBump/isRunning", isRunning);
-        //SmartDashboard.putNumber("AlignToBump/Error", error);
+        SmartDashboard.putNumber("AlignToBump/Error", error);
     }
     @Override
     public void execute() {
-        error = drive.getRotation().getDegrees();//Get the error between current angle and desired angle.
+        error = drive.getRotation().getDegrees()-0;//Get the error between current angle and desired angle.
         double rotSpeed = rotController.calculate(error);
-        SmartDashboard.putNumber("AlignToBump/Error", error);
-        DriveCommands.robotJoystickDrive(drive, 0, 0,rotSpeed).execute();
+        DriveCommands.joystickDrive(drive, () -> 0, () -> 0, () -> rotSpeed).withTimeout(2).execute();
     }
     @Override
     public void end(boolean interrupted) {
-        DriveCommands.joystickDrive(drive, () -> 0, () -> 0, () -> 0).schedule();
-        drive.scoreFuel();
+
     }
-    @Override 
-    public boolean isFinished(){
-        return Math.abs(error)<2;
-    }
+
 }

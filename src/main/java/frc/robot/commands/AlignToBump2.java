@@ -11,12 +11,15 @@ public class AlignToBump2 extends Command{
     Drive m_drive;
     GenericHID m_controller;
     double error;
-    double speedMult;
+
+    boolean readyToDriveOver = false;
+    Command driveCommand = goOverBump();
     public AlignToBump2(Drive drive, GenericHID controller) {
         rotController.setSetpoint(0);//This makes the robot face 0 degrees
         rotController.enableContinuousInput(-180, 180);
         m_drive = drive;
         m_controller = controller;
+        addRequirements(drive);
     }
     @Override
     public void initialize() {
@@ -30,20 +33,21 @@ public class AlignToBump2 extends Command{
         //Normally, speedMult will be a constant taken from the normal speed of the joystick.
         //This feature will allow the driver to drive around while rotating. 
         //You can also slow down the robot for microadjustments.
-        DriveCommands.joystickDrive(m_drive, () -> -m_controller.getRawAxis(1)*speedMult, () -> -m_controller.getRawAxis(0)*speedMult, ()->rotSpeed).execute();
-    }
-    public void setSpeedMult(double mult){
-        speedMult = mult;
+        if (!readyToDriveOver){
+            DriveCommands.joystickDrive(m_drive, ()->0, () ->0, ()->rotSpeed).execute();
+        } 
+        if (Math.abs(error)<1){
+            driveCommand.execute();
+            readyToDriveOver = true;
+        }
     }
     @Override
     public void end(boolean interrupted) {
-        if (!interrupted){
-            goOverBump().schedule();
-        }
+        DriveCommands.joystickDrive(m_drive, ()->0, () ->0, ()->0).schedule();
+        driveCommand.cancel();
     }
     @Override 
     public boolean isFinished(){
-        //return false;
         return Math.abs(error)<1;
     }
     public Command goOverBump(){
@@ -53,19 +57,20 @@ public class AlignToBump2 extends Command{
         if (xPos<8.256) { //If the robot is on the blue side of the field
                 if (xPos<4.626){
                         return DriveCommands.joystickDrive(m_drive,
-                                ()-> bumpSpeed,() -> 0, () -> 0).until(()->m_drive.getPose().getX()>4.626+0.5588+odomError);
+                                ()-> -bumpSpeed,() -> 0, () -> 0).until(()->m_drive.getPose().getX()>4.626+0.5588+odomError);
                 } else {
                         return DriveCommands.joystickDrive(m_drive,
-                                ()-> -bumpSpeed,() -> 0, () -> 0).until(()->m_drive.getPose().getX()<4.626-0.5588-odomError);
+                                ()-> bumpSpeed,() -> 0, () -> 0).until(()->m_drive.getPose().getX()<4.626-0.5588-odomError);
                 }
         } else {
             if (xPos<11.915){
                 return DriveCommands.joystickDrive(m_drive,
-                        ()-> bumpSpeed,() -> 0, () -> 0).until(()->m_drive.getPose().getX()>11.915+0.5588+odomError);
+                        ()-> -bumpSpeed,() -> 0, () -> 0).until(()->m_drive.getPose().getX()>11.915+0.5588+odomError);
             } else {
                 return DriveCommands.joystickDrive(m_drive,
-                        ()-> -bumpSpeed,() -> 0, () -> 0).until(()->m_drive.getPose().getX()<11.915-0.5588-odomError);
+                        ()-> bumpSpeed,() -> 0, () -> 0).until(()->m_drive.getPose().getX()<11.915-0.5588-odomError);
             }
         }
+        
     }
 }

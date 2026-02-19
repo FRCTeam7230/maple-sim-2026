@@ -317,7 +317,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
@@ -486,6 +486,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   public void CancelMegatagFilter()
   {
     IDFilter = null;
+  }
+  public double getTurnRate(){
+    return gyroInputs.yawVelocityRadPerSec;
   }
   public void updateMegatag() {
     // currentPose = m_odometry.update(

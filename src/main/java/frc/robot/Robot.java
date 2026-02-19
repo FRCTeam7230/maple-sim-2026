@@ -18,6 +18,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
@@ -37,7 +40,7 @@ import org.littletonrobotics.urcl.URCL;
 public class Robot extends LoggedRobot {
     private Command autonomousCommand;
     private RobotContainer robotContainer;
-
+    private final ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<>();//This is the robot queue from the java swing thread for key listeners.
     public Robot() {
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -84,6 +87,7 @@ public class Robot extends LoggedRobot {
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
         robotContainer = new RobotContainer();
+        robotContainer.setFrameKeyboardControl(queue);
     }
 
     /** This function is called periodically during all modes. */
@@ -97,6 +101,9 @@ public class Robot extends LoggedRobot {
         // finished or interrupted commands, and running subsystem periodic() methods.
         // This must be called from the robot's periodic block in order for anything in
         // the Command-based framework to work.
+        while (!queue.isEmpty()) {
+            queue.poll().run();
+        }
         CommandScheduler.getInstance().run();
 
         // Return to normal thread priority
