@@ -85,6 +85,10 @@ public class DriveCommands {
           // Get linear velocity
           Translation2d linearVelocity =
               getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+          if (!IS_FIELD_RELATIVE){
+            linearVelocity = getLinearVelocityFromJoysticks(
+              -xSupplier.getAsDouble(), -ySupplier.getAsDouble());
+          }
 
           // Apply rotation deadband
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), 0);
@@ -98,14 +102,19 @@ public class DriveCommands {
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
-          boolean isFlipped =
-              false;
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds,
-                  isFlipped
-                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                      : drive.getRotation()));
+          if(!IS_FIELD_RELATIVE){
+            speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, new Rotation2d(Math.PI));
+          }
+          if(IS_FIELD_RELATIVE){
+            boolean isFlipped = DriverStation.getAlliance().isPresent()
+                    && DriverStation.getAlliance().get() == Alliance.Red;
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    speeds,
+                    isFlipped ? drive.getRotation()
+                                    .plus(new Rotation2d(Math.PI))
+                                    : drive.getRotation());
+          }
+          drive.runVelocity(speeds);
         },
         drive);
   }

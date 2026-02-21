@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlignToHub;
@@ -50,6 +51,7 @@ public class RobotContainer {
 
     // Controller
     private final Boolean controllerMode = false;
+    
     private final GenericHID controller = new GenericHID(0);
 
     // Dashboard inputs
@@ -173,9 +175,8 @@ public class RobotContainer {
                         Commands.runOnce(drive::intakeStop, drive)
                 );
             // fix this to a pov, povDown GenericHID
-            new JoystickButton(controller, /*change*/2)
-                .whileTrue(DriveCommands.toggleDrive().alongWith(Commands.run(() -> controller.setRumble(
-                        RumbleType.kBothRumble, 0.5)))); //toggle Field Relative
+            new POVButton(controller, /*change*/180)
+                .whileTrue(DriveCommands.toggleDrive()); //toggle Field Relative
 
             new JoystickButton(controller, /*change*/3)
                 .onTrue(
