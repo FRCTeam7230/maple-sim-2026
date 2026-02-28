@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.7485777777777782,
-        "y": 3.9472999999999994
+        "x": 7.118459343794578,
+        "y": 6.512753209700428
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5309975056532874,
-        "y": 4.871982433312004
+        "x": 5.687681689738204,
+        "y": 6.051768766642691
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Intake Endpoint"
     },
     {
       "anchor": {
-        "x": 0.2,
-        "y": 6.3
+        "x": 5.7,
+        "y": 6.045698795180723
       },
       "prevControl": {
-        "x": 1.4859727517322943,
-        "y": 5.320990598819802
+        "x": 5.980209337396092,
+        "y": 6.157383606825022
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Depot"
+      "linkedName": "Bump Auto Neutral Zone"
     }
   ],
   "rotationTargets": [],
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -90.0
+    "velocity": 0.2,
+    "rotation": 38.412
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -179.52
+    "rotation": 38.412
   },
   "useDefaultConstraints": true
 }
