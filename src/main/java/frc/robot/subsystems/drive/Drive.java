@@ -376,7 +376,7 @@ public ChassisSpeeds getChassisSpeeds() {
       // The height at which the fuel is ejected
       Meters.of(.38),
       // The initial speed of the fuel
-      MetersPerSecond.of(7),
+      MetersPerSecond.of(velocity),
       // The fuel is at 45degrees
       Degrees.of(70)));
     }

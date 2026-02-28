@@ -31,7 +31,7 @@ public class AlignToHub extends Command {
   PIDController rotController = new PIDController(0.07, 0, 0.002);
 
   private final GenericHID controller = new GenericHID(0);
-  double speedMult = 0.5;
+  double speedMult = 0.65;
   double globalTargetAngle;
 
   Command drivecommand = null;
@@ -141,7 +141,7 @@ public class AlignToHub extends Command {
       double errorAngle = targetAngle - pose.getRotation().getDegrees();
 
       //angle offset calculations
-      initialEjectionVelocityAfterOffset = initialEjectionVelocityBeforeOffset;// + Math.abs(0.1*zInitialVelocityRobotRelative);
+      initialEjectionVelocityAfterOffset = initialEjectionVelocityBeforeOffset + Math.abs(0.3*zInitialVelocityRobotRelative);
       m_drive.setInitialVelocity(initialEjectionVelocityAfterOffset);
       vx0 = initialEjectionVelocityBeforeOffset*Math.cos(Math.toRadians(ejectionAngle));
 
