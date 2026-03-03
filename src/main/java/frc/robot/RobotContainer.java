@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -29,6 +31,9 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
+
+import java.util.Map;
+import java.util.Optional;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -56,6 +61,14 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+
+    private Command alignCommand = null;
+    
+  private enum BehaviorSelector
+  {
+    SHOOT,
+    PASS
+  }
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -134,11 +147,18 @@ public class RobotContainer {
                 "Drive SysId (Quasistatic Reverse)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
         autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
+         alignCommand = new SelectCommand<>(
+      Map.ofEntries(
+        Map.entry(BehaviorSelector.SHOOT, new AlignToHub(drive)),
+        Map.entry(BehaviorSelector.PASS, new InstantCommand(() -> System.out.println("Selected PASS")))
+      ),
+      this::passOrShootSelector
+    );
         // Configure the button bindings
         configureButtonBindings();
 
         drive.initalizeIntake();
+
     }
 
     double speedMult = 0.75;
@@ -229,7 +249,7 @@ public class RobotContainer {
                 Commands.runOnce(resetGyro, drive)
                 .ignoringDisable(true)
                 .andThen(new InstantCommand(()->{AlignToHub.setGlobalAngleOffsetRad0();}))
-                .andThen(new AlignToHub(drive))
+                .andThen(alignCommand)
             );
 
         }
@@ -260,4 +280,16 @@ public class RobotContainer {
         Logger.recordOutput(
                 "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
     }
+      public BehaviorSelector passOrShootSelector() {
+        boolean isBlue = DriverStation.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue));
+    double threshold = isBlue ? 4 : 16.54 - 4;
+    if((drive.getPose().getX()>threshold)==isBlue)
+    {
+      return BehaviorSelector.PASS;
+    }
+    else
+    {
+      return BehaviorSelector.SHOOT;
+    }
+  }
 }
