@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 3.5820120481927713,
-        "y": 5.98
+        "y": 6.0
       },
       "prevControl": null,
       "nextControl": {
         "x": 2.695291590032763,
-        "y": 5.314137594573507
+        "y": 5.334137594573507
       },
       "isLocked": false,
       "linkedName": "Bump Auto Alliance Shoot"
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 4.8,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -45,10 +45,10 @@
     "rotation": -11.741368442452806
   },
   "reversed": false,
-  "folder": "Bump Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -38.42
   },
   "useDefaultConstraints": true
 }

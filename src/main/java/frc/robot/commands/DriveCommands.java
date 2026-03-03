@@ -45,7 +45,7 @@ public class DriveCommands {
 
   private DriveCommands() {}
 
-  private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
+  public static Translation2d getLinearVelocityFromJoysticks(double x, double y) {//was private.
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
@@ -113,18 +113,52 @@ public class DriveCommands {
         },
         drive);
   }
-  public static double speedMult = 1;
-  public static Command customJoystickDrive(
+  public static Command joystickDriveInstant(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier
-  ){
-    return joystickDrive(drive, ()->xSupplier.getAsDouble()*speedMult, ()->ySupplier.getAsDouble()*speedMult, ()->omegaSupplier.getAsDouble()*speedMult);
+      DoubleSupplier omegaSupplier) {
+    return Commands.runOnce(
+        () -> {
+          // Get linear velocity
+          Translation2d linearVelocity =
+              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+          // Apply rotation deadband
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), 0);
+
+          // Square rotation value for more precise control
+          omega = Math.copySign(omega * omega, omega);
+
+          // Convert to field relative speeds & send command
+          ChassisSpeeds speeds =
+              new ChassisSpeeds(
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                  omega * drive.getMaxAngularSpeedRadPerSec());
+          boolean isFlipped =
+              false;
+          drive.runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  speeds,
+                  isFlipped
+                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      : drive.getRotation()));
+        },
+        drive);
   }
-  public static void updateCustomSpeedMult(double newMult){
-    speedMult = newMult;
-  }
+  // public static double speedMult = 1;
+  // public static Command customJoystickDrive(
+  //     Drive drive,
+  //     DoubleSupplier xSupplier,
+  //     DoubleSupplier ySupplier,
+  //     DoubleSupplier omegaSupplier
+  // ){
+  //   return joystickDrive(drive, ()->xSupplier.getAsDouble()*speedMult, ()->ySupplier.getAsDouble()*speedMult, ()->omegaSupplier.getAsDouble()*speedMult);
+  // }
+  // public static void updateCustomSpeedMult(double newMult){
+  //   speedMult = newMult;
+  // }
 
   public static Command robotJoystickDrive(
                   Drive drive, double xSupplier, double ySupplier, double omegaSupplier) {

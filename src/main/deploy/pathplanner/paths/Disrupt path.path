@@ -149,7 +149,7 @@
   ],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 4.8,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -158,7 +158,7 @@
   },
   "goalEndState": {
     "velocity": 1.0,
-    "rotation": 134.99999999999997
+    "rotation": -25.880273670068846
   },
   "reversed": false,
   "folder": null,

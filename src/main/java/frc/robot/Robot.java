@@ -87,7 +87,7 @@ public class Robot extends LoggedRobot {
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
         robotContainer = new RobotContainer();
-        robotContainer.setFrameKeyboardControl(queue);
+        //robotContainer.setFrameKeyboardControl(queue);
     }
 
     /** This function is called periodically during all modes. */
@@ -149,7 +149,9 @@ public class Robot extends LoggedRobot {
 
     /** This function is called periodically during operator control. */
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+        
+    }
 
     /** This function is called once when test mode is enabled. */
     @Override

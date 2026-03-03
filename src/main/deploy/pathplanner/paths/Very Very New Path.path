@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.911440798858774,
-        "y": 5.3353352353780314
+        "x": 5.682268188302425,
+        "y": 5.050684736091298
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.911440798858775,
-        "y": 5.3353352353780314
+        "x": 6.682268188302419,
+        "y": 5.050684736091298
       },
       "isLocked": false,
-      "linkedName": "Top Neutral Zone intake"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.20530670470756,
-        "y": 6.1245934379457925
+        "x": 3.58,
+        "y": 5.050684736091298
       },
       "prevControl": {
-        "x": 8.282938659058487,
-        "y": 4.9083594864479325
+        "x": 2.58,
+        "y": 5.050684736091298
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Top Neutral Zone intake end"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 3.0,
-    "rotation": -91.36392753160274
+    "velocity": 0,
+    "rotation": -141.588
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Utility",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -141.588
   },
   "useDefaultConstraints": true
 }

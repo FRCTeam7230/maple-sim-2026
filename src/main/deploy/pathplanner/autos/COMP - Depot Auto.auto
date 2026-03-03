@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Rush to Bottum Neutral Zone"
+            "pathName": "Rush to Depot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Fuel"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake From Depot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Bottum Neutral Zone to Shooting"
+            "pathName": "Depot to shooting"
           }
         },
         {
@@ -25,31 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Shooting to Outpost"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Outpost to Shooting"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Outpost climb"
+            "pathName": "Depot Climb"
           }
         },
         {

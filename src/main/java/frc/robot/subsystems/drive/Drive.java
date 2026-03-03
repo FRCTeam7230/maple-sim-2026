@@ -17,6 +17,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -557,5 +558,35 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
 
     //error_publisher.set(errors);
     SmartDashboard.putNumberArray("errors", errors);
+  }
+  public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative){
+    // if (fieldRelative){
+    //   DriveCommands.joystickDriveInstant(this, ()->xSpeed, ()->ySpeed, ()->rotSpeed).schedule();
+    // } else {
+    //   //DriveCommands.robotJoystickDrive(this, xSpeed, ySpeed, rotSpeed).schedule();
+    // }
+    Translation2d linearVelocity =
+              DriveCommands.getLinearVelocityFromJoysticks(xSpeed, ySpeed);
+
+          // Apply rotation deadband
+          double omega = MathUtil.applyDeadband(rotSpeed, 0);
+
+          // Square rotation value for more precise control
+          omega = Math.copySign(omega * omega, omega);
+
+          // Convert to field relative speeds & send command
+          ChassisSpeeds speeds =
+              new ChassisSpeeds(
+                  linearVelocity.getX() * getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * getMaxLinearSpeedMetersPerSec(),
+                  omega * getMaxAngularSpeedRadPerSec());
+          boolean isFlipped =
+              false;
+          runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  speeds,
+                  isFlipped
+                      ? getRotation().plus(new Rotation2d(Math.PI))
+                      : getRotation()));
   }
 }

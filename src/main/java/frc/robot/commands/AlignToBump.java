@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 
-public class AlignToBump extends Command{
+public class AlignToBump extends Command{//This is the old edition.
     PIDController rotController = new PIDController(0.03, 0, 0);
     Drive m_drive;
     double currentAngle;
@@ -16,7 +16,7 @@ public class AlignToBump extends Command{
     boolean readyToDriveOver;
     Command driveCommand;
     double a = 0;
-    public AlignToBump(Drive drive) {
+    public  AlignToBump(Drive drive) {
         rotController.setSetpoint(0);//This makes the robot face 0 degrees.
         rotController.enableContinuousInput(-180, 180);
         m_drive = drive;
@@ -58,6 +58,7 @@ public class AlignToBump extends Command{
         if (driveCommand!=null){
             driveCommand.cancel();
         }
+        //DriveCommands.joystickDrive(m_drive, ()->0, ()->0, ()->0).schedule();
     }
     @Override 
     public boolean isFinished(){

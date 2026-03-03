@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.InternalButton;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -64,8 +65,8 @@ import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+// import javax.swing.JFrame;
+// import javax.swing.JLabel;
 
 
 /**
@@ -86,7 +87,7 @@ public class RobotContainer {
         
    // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
-        JFrame frame = new JFrame();
+        //JFrame frame = new JFrame();
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         // AIRobotInSimulation a = new AIRobotInSimulation(
@@ -157,9 +158,38 @@ public class RobotContainer {
         }
         drive.initalizeIntake();
         NamedCommands.registerCommand("Shoot", new SpamShootCommands(drive, true));
+         NamedCommands.registerCommand("Align To Bump", 
+                new AlignToBump2(drive)
+        );
+        SmartDashboard.putData("Align To Bump Command", new AlignToBump2(drive));
+        SmartDashboard.putData("Align To Hub Command", new AlignToHub(drive));
         NamedCommands.registerCommand("Intake Fuel", 
                 Commands.runOnce(drive::intakeStart, drive)
         );
+        NamedCommands.registerCommand("Stop Intake", 
+                Commands.runOnce(drive::intakeStop, drive)
+        );
+        NamedCommands.registerCommand("Intake From Depot", 
+                ///Commands.runOnce(drive::intakeStop, drive)
+                Commands.run(()->{drive.drive(0,0.5,0,false);},drive).withTimeout(10/(4.8*0.5))//1 meter
+        );
+        NamedCommands.registerCommand("COMP - Auto w Align To Bump Start Position", 
+            Commands.runOnce(()->{//Commands.runOnce works, but InstantCommand doesn't. don't ask me why.
+                if (DriverStation.getAlliance().get().equals(Alliance.Blue)){
+                        drive.resetOdometry(new Pose2d(3.58, 5.15, Rotation2d.fromDegrees(-141.88)));//YOU MUST UPDATE THIS IF YOU WANT TO CHANGE THE STARTING POSITION OF THE BOT
+                } else if (DriverStation.getAlliance().get().equals(Alliance.Red)){
+                        drive.resetOdometry(new Pose2d(16.541-3.58, 5.15, Rotation2d.fromDegrees(-141.88)));
+                }
+            })
+        );
+        SmartDashboard.putData("COMP - Auto w Align To Bump Start Position", 
+            Commands.runOnce(()->{
+                if (DriverStation.getAlliance().get().equals(Alliance.Blue)){
+                        drive.resetOdometry(new Pose2d(3.58, 5.15, Rotation2d.fromDegrees(-141.88)));//YOU MUST UPDATE THIS IF YOU WANT TO CHANGE THE STARTING POSITION OF THE BOT
+                } else if (DriverStation.getAlliance().get().equals(Alliance.Red)){
+                        drive.resetOdometry(new Pose2d(16.541-3.58, 5.15, Rotation2d.fromDegrees(-141.88)));
+                }
+            }));
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -174,13 +204,13 @@ public class RobotContainer {
         autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
         // Configure the button bindings
-        SmartDashboard.putData("Depot Auto", new PathPlannerAuto("Depot Auto"));
-        SmartDashboard.putData("Bump Auto", new PathPlannerAuto("Bump Auto"));
-        SmartDashboard.putData("Align To Bump", Commands.runOnce(
-                                ()->{alignToBump = new AlignToBump(drive); 
-                                alignToBump.schedule();},
-                        drive));
-        
+        SmartDashboard.putData("COMP - Depot Auto", new PathPlannerAuto("COMP - Depot Auto"));
+        SmartDashboard.putData("COMP - Auto w align to bump", new PathPlannerAuto("COMP - Auto w align to bump"));
+        //SmartDashboard.putData("Bump Auto", new PathPlannerAuto("Bump Auto"));
+        // // SmartDashboard.putData("Align To Bump", Commands.runOnce(
+        // //                         ()->{alignToBump = new AlignToBump(drive); 
+        // //                         alignToBump.schedule();},
+        //                 drive));
         configureButtonBindings();
         //setFrameKeyboardControl();
         
@@ -197,7 +227,7 @@ public class RobotContainer {
         double speedMult = 0.75;
         double rotMult = 0.65;
         AlignToHub alignToHub;
-        AlignToBump alignToBump;
+        AlignToBump2 alignToBump;
     private void configureButtonBindings() {
         double slowSpeed = 0.4;
 
@@ -230,15 +260,15 @@ public class RobotContainer {
                 new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
 
         if(controllerMode){
-                if (DriverStation.getAlliance().equals(Alliance.Red)){
-                        drive.setDefaultCommand(DriveCommands.joystickDrive(
+               // if (DriverStation.getAlliance().equals(Alliance.Red)){
+                drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> controller.getRawAxis(1)*speedMult, () -> controller.getRawAxis(0)*speedMult, () -> -controller.getRawAxis(4)*rotMult)
-                );
-                } else {
-                        drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getRawAxis(1)*speedMult, () -> -controller.getRawAxis(0)*speedMult, () -> -controller.getRawAxis(4)*rotMult)
-                );
-                }
+                );//TODO: Joystick drive has an isFlipped boolean that flips for the alliance. 
+                // } else {
+                //         drive.setDefaultCommand(DriveCommands.joystickDrive(
+                // drive, () -> -controller.getRawAxis(1)*speedMult, () -> -controller.getRawAxis(0)*speedMult, () -> -controller.getRawAxis(4)*rotMult)
+                // );
+                // }
             
             
             
@@ -258,12 +288,12 @@ public class RobotContainer {
                 new JoystickButton(controller, /*change*/4)
                 .onTrue(
                         Commands.runOnce(
-                                ()->{alignToBump = new AlignToBump(drive); 
+                                ()->{alignToBump = new AlignToBump2(drive); 
                                 alignToBump.schedule();},
                         drive)
                 ).onFalse(Commands.runOnce(()->alignToBump.cancel()));
                 new Trigger(() -> controller.getRawAxis(/*change*/3) > 0.5)
-                .onTrue(//change to whiletrue for holding.
+                .whileTrue(//change to whiletrue for holding.
                             new SpamShootCommands(drive,false)
                 );
             // fix this to a pov, povDown GenericHID
@@ -362,6 +392,15 @@ public class RobotContainer {
         if (Constants.currentMode != Constants.Mode.SIM) return;
 
         drive.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
+        // if (DriverStation.getAlliance().equals(Alliance.Red)){
+        //         drive.setDefaultCommand(DriveCommands.joystickDrive(
+        // drive, () -> controller.getRawAxis(1)*speedMult, () -> controller.getRawAxis(0)*speedMult, () -> -controller.getRawAxis(4)*rotMult)
+        // );
+        // } else {
+        //         drive.setDefaultCommand(DriveCommands.joystickDrive(
+        // drive, () -> -controller.getRawAxis(1)*speedMult, () -> -controller.getRawAxis(0)*speedMult, () -> -controller.getRawAxis(4)*rotMult)
+        // );
+        //         }
         SimulatedArena.getInstance().resetFieldForAuto();
     }
 
@@ -380,71 +419,71 @@ public class RobotContainer {
 
     
 
-    public void setFrameKeyboardControl(ConcurrentLinkedQueue<Runnable> queue){
-        JLabel label = new JLabel("No input");
-        label.setFont(new Font("Arial",Font.BOLD, 30));
-        frame.setTitle("My JFrame Example");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 300);
-        frame.add(label);
-        frame.setVisible(true);
-        frame.addKeyListener(
-                new KeyListener() {
-                        @Override
-                        public void keyPressed(KeyEvent e){
-                                switch (e.getKeyCode()){
-                                        case KeyEvent.VK_W:
-                                        queue.add(() -> DriveCommands.joystickDrive(drive, () -> 0, () -> -1, () -> 0).schedule());
-                                        break;
-                                        case KeyEvent.VK_S:
-                                        queue.add(() -> DriveCommands.joystickDrive(drive, () -> 0, () -> 1, () -> 0).schedule());
-                                        break;
-                                        case KeyEvent.VK_A:
-                                        queue.add(() -> DriveCommands.joystickDrive(drive, () -> 1, () -> 0, () -> 0).schedule());
-                                        break;
-                                        case KeyEvent.VK_D:
-                                        queue.add(() -> DriveCommands.joystickDrive(drive, () -> -1, () -> 0, () -> 0).schedule());
-                                        break;
-                                        case KeyEvent.VK_LEFT:
-                                        queue.add(() -> DriveCommands.joystickDrive(drive, () -> 0, () -> 0, () -> 1).schedule());
-                                        break;
-                                        case KeyEvent.VK_RIGHT:
-                                        queue.add(() -> DriveCommands.joystickDrive(drive, () -> 0, () -> 0, () -> -1).schedule());
-                                        break;
-                                        case KeyEvent.VK_K:
-                                                queue.add(() -> new SpamShootCommands(drive,false));
-                                        break;
-                                        case KeyEvent.VK_J:
-                                                queue.add(drive::intakeStart);
-                                        break;
-                                        case KeyEvent.VK_L:
-                                                queue.add(drive::intakeStop);
-                                        break;
-                                        case KeyEvent.VK_O:
-                                                queue.add(() -> {alignToHub = new AlignToHub(drive); alignToHub.schedule();});
-                                        case KeyEvent.VK_U:
-                                                queue.add(() -> new AlignToBump(drive));
-                                        break;
-                                }
-                                label.setText(KeyEvent.getKeyText(e.getKeyCode()));
-                                controllerSim.notifyNewData();
-                        }
-                        @Override
-                        public void keyReleased(KeyEvent e){
-                                switch (e.getKeyCode()){
-                                        case KeyEvent.VK_O:
-                                                queue.add(() -> alignToHub.cancel());
-                                        break;
-                                }
-                                DriveCommands.joystickDrive(drive, () -> 0, () -> 0, () -> 0).schedule();
+    // public void setFrameKeyboardControl(ConcurrentLinkedQueue<Runnable> queue){
+    //     JLabel label = new JLabel("No input");
+    //     label.setFont(new Font("Arial",Font.BOLD, 30));
+    //     frame.setTitle("My JFrame Example");
+    //     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    //     frame.setSize(400, 300);
+    //     frame.add(label);
+    //     frame.setVisible(true);
+    //     frame.addKeyListener(
+    //             new KeyListener() {
+    //                     @Override
+    //                     public void keyPressed(KeyEvent e){
+    //                             switch (e.getKeyCode()){
+    //                                     case KeyEvent.VK_W:
+    //                                     queue.add(() -> DriveCommands.joystickDrive(drive, () -> 0, () -> -1, () -> 0).schedule());
+    //                                     break;
+    //                                     case KeyEvent.VK_S:
+    //                                     queue.add(() -> DriveCommands.joystickDrive(drive, () -> 0, () -> 1, () -> 0).schedule());
+    //                                     break;
+    //                                     case KeyEvent.VK_A:
+    //                                     queue.add(() -> DriveCommands.joystickDrive(drive, () -> 1, () -> 0, () -> 0).schedule());
+    //                                     break;
+    //                                     case KeyEvent.VK_D:
+    //                                     queue.add(() -> DriveCommands.joystickDrive(drive, () -> -1, () -> 0, () -> 0).schedule());
+    //                                     break;
+    //                                     case KeyEvent.VK_LEFT:
+    //                                     queue.add(() -> DriveCommands.joystickDrive(drive, () -> 0, () -> 0, () -> 1).schedule());
+    //                                     break;
+    //                                     case KeyEvent.VK_RIGHT:
+    //                                     queue.add(() -> DriveCommands.joystickDrive(drive, () -> 0, () -> 0, () -> -1).schedule());
+    //                                     break;
+    //                                     case KeyEvent.VK_K:
+    //                                             queue.add(() -> new SpamShootCommands(drive,false));
+    //                                     break;
+    //                                     case KeyEvent.VK_J:
+    //                                             queue.add(drive::intakeStart);
+    //                                     break;
+    //                                     case KeyEvent.VK_L:
+    //                                             queue.add(drive::intakeStop);
+    //                                     break;
+    //                                     case KeyEvent.VK_O:
+    //                                             queue.add(() -> {alignToHub = new AlignToHub(drive); alignToHub.schedule();});
+    //                                     case KeyEvent.VK_U:
+    //                                             queue.add(() -> new AlignToBump(drive));
+    //                                     break;
+    //                             }
+    //                             label.setText(KeyEvent.getKeyText(e.getKeyCode()));
+    //                             controllerSim.notifyNewData();
+    //                     }
+    //                     @Override
+    //                     public void keyReleased(KeyEvent e){
+    //                             switch (e.getKeyCode()){
+    //                                     case KeyEvent.VK_O:
+    //                                             queue.add(() -> alignToHub.cancel());
+    //                                     break;
+    //                             }
+    //                             DriveCommands.joystickDrive(drive, () -> 0, () -> 0, () -> 0).schedule();
                                 
-                        }
-                        @Override
-                        public void keyTyped(KeyEvent e){
+    //                     }
+    //                     @Override
+    //                     public void keyTyped(KeyEvent e){
 
-                        }
-                }
-        );
+    //                     }
+    //             }
+    //     );
         
-    }
+    // }
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.011226818830243,
-        "y": 6.202225392296718
+        "x": 7.118459343794578,
+        "y": 6.7974037089871615
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.8163087832632785,
-        "y": 5.825713267420626
+        "x": 5.687681689738204,
+        "y": 6.3364192659294245
       },
       "isLocked": false,
       "linkedName": "Intake Endpoint"
     },
     {
       "anchor": {
-        "x": 5.538072289156627,
-        "y": 6.045698795180723
+        "x": 5.7,
+        "y": 6.0
       },
       "prevControl": {
-        "x": 5.774724831486405,
-        "y": 6.126293920398397
+        "x": 5.980209337396092,
+        "y": 6.111684811644299
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 4.8,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0.2,
-    "rotation": 180.0
+    "rotation": -38.412
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -89.27477570094071
+    "rotation": -38.412
   },
   "useDefaultConstraints": true
 }
