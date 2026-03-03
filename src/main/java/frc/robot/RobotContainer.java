@@ -157,6 +157,8 @@ public class RobotContainer {
                 break;
         }
         drive.initalizeIntake();
+        NamedCommands.registerCommand("Align",(new AlignToHub(drive)));
+
         NamedCommands.registerCommand("Shoot", new SpamShootCommands(drive, true));
          NamedCommands.registerCommand("Align To Bump", 
                 new AlignToBump2(drive)

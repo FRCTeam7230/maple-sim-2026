@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.534450784593438,
-        "y": 4.00265335235378
+        "x": 2.735155555555556,
+        "y": 7.046033333333332
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.295135054230824,
-        "y": 4.0749581322857376
+        "x": 2.3619205609646996,
+        "y": 6.06323508492993
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ODepot Shoot"
     },
     {
       "anchor": {
-        "x": 1.7801999999999998,
-        "y": 5.0484222222222215
+        "x": 1.0502282453637657,
+        "y": 4.804850213980028
       },
       "prevControl": {
-        "x": 2.153625353074134,
-        "y": 4.9581309924087895
-      },
-      "nextControl": {
-        "x": 1.4114964548279012,
-        "y": 5.137571757078662
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 0.2,
-        "y": 5.15
-      },
-      "prevControl": {
-        "x": 0.8742347802060821,
-        "y": 5.046378605432675
+        "x": 1.2687156102170647,
+        "y": 5.145652636181098
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Top clmb"
     }
   ],
   "rotationTargets": [],
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -170.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -64.98310652189996
   },
   "useDefaultConstraints": true
 }

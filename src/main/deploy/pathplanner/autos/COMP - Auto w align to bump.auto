@@ -23,7 +23,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Intake Fuel"
+                  "name": "Stop Intake"
                 }
               }
             ]
@@ -42,7 +42,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Stop Intake"
+                  "name": "Intake Fuel"
                 }
               }
             ]
@@ -58,6 +58,25 @@
           "type": "path",
           "data": {
             "pathName": "Bump Path Part 4"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.5
+                }
+              }
+            ]
           }
         },
         {
