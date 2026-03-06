@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.InternalButton;
@@ -40,15 +39,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.ControllerConstants;
-import frc.robot.Constants.ElevatorConstants;
+import frc.robot.commands.AlignToBump;
 import frc.robot.commands.AlignToBump2;
 import frc.robot.commands.AlignToHub;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SpamShootCommands;
 import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import frc.robot.subsystems.elevator.ElevatorSubsystemSim;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.AIRobotInSimulation;
 
@@ -80,21 +76,11 @@ import java.awt.event.KeyListener;
  */
 public class RobotContainer {
     // Subsystems
-    private Command m_ClimberMaxHeightCommand;
-    private Command m_ClimberMinHeightCommand;
-
-    private final ElevatorSubsystem m_Climber;
     private final Drive drive;
     private SwerveDriveSimulation driveSimulation = null;
     private final Vision vision;
-    
 
     // Controller
-//    private final Boolean controllerMode = false;
-    
-//    private final Joystick controller = new Joystick(OIConstants.kDriverControllerPort);
-    
-    // Dashboard inputs
     private final Boolean controllerMode = true;
     private final GenericHID controller = new GenericHID(0);
    private  GenericHIDSim controllerSim = new GenericHIDSim(controller);
@@ -112,18 +98,8 @@ public class RobotContainer {
         arena.setShouldRunClock(false);
         arena.setEfficiencyMode(true);
         SimulatedArena.overrideInstance(arena);
-        m_Climber = new ElevatorSubsystem();
-        m_ClimberMaxHeightCommand = Commands.runEnd(
-            () -> m_Climber.reachGoal(ElevatorConstants.kMaxElevatorHeightMeters),
-            () -> m_Climber.stop(),
-            m_Climber);
-
-        m_ClimberMinHeightCommand = Commands.runEnd(
-            () -> m_Climber.reachGoal(ElevatorConstants.kMinElevatorHeightMeters),
-            () -> m_Climber.stop(),
-            m_Climber);
-            
         
+
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
@@ -353,27 +329,6 @@ public class RobotContainer {
             new JoystickButton(controller, 8) //press Rjoystick for reset gyro
                     .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
-            new JoystickButton(controller, 7)
-            .onTrue(
-                new SequentialCommandGroup(new RunCommand(() -> drive.drive(0, 0.1, 0, false), drive).withTimeout(0.5)
-                )
-                .alongWith(
-                    m_Climber.setGoal(Constants.ElevatorConstants.kMaxElevatorHeightMeters)
-                    .until(m_Climber.atHeight(Constants.ElevatorConstants.kMaxElevatorHeightMeters, 0.05))
-                )
-                .andThen(
-                //m_Climber.setGoal(Constants.ClimberConstants.kMinRealClimberHeightMeters)
-                new RunCommand(()->m_Climber.setManualOutput(-0.2))
-                .until(m_Climber.atHeight(Constants.ElevatorConstants.kMinElevatorHeightMeters, 0.05))
-                )
-            );
-            ButtonMappings.button(m_driverController, ControllerConstants.CLIMBDESCENT)
-            .onTrue(
-                new RunCommand(()->m_Climber.setManualOutput(0.2))
-                //m_Climber.setGoal(Constants.ClimberConstants.kMaxRealClimberHeightMeters)
-                .until(m_Climber.atHeight(Constants.ClimberConstants.kMaxRealClimberHeightMeters, 0.05))//Raise the tolerance if the climber doesn't need to extend all the way.
-            );
-
         } else {
             // if we aren't using controller
         //     drive.setDefaultCommand(DriveCommands.joystickDrive(
@@ -426,40 +381,6 @@ public class RobotContainer {
         controllerSim = new GenericHIDSim(controller);   
         }
 
-            new JoystickButton(controller, 2)
-            .whileTrue(
-                Commands.runOnce(resetGyro, drive)
-                .ignoringDisable(true)
-                .andThen(new InstantCommand(()->{AlignToHub.setGlobalAngleOffsetRad0();}))
-                .andThen(alignCommand)
-            );
-
-        }
-        
-        //Climber Controls
-        //Climb UP
-        //Climber TODO: Can we use a constant for the button numbers? Check which ones will be used in the real controller
-        new JoystickButton(controller, ControllerConstants.CLIMBUP)
-            .whileTrue(m_ClimberMaxHeightCommand);
-
-        new JoystickButton(controller, ControllerConstants.CLIMBDOWN)
-            .whileTrue(m_ClimberMinHeightCommand);
-        
-/*
-        //Climb Up and Down
-        //Climber TODO: Comment this out until we're ready to test it
-        
-        ButtonMappings.button(m_driverController, 4)
-            .onTrue(new InstantCommand(() -> {
-            m_ClimberHightCommand1.schedule();
-            m_DriveRun.schedule();
-            m_ClimberHightCommand2.schedule();
-            }, m_Climber));
-        m_ClimberHightCommand1.andThen(m_DriveRun).andThen(m_ClimberHightCommand2);
-        */
-    }
-
-    
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
