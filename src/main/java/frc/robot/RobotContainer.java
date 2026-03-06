@@ -173,7 +173,7 @@ public class RobotContainer {
         );
         NamedCommands.registerCommand("Intake From Depot", 
                 ///Commands.runOnce(drive::intakeStop, drive)
-                Commands.run(()->{drive.drive(0,0.5,0,false);},drive).withTimeout(10/(4.8*0.5))//1 meter
+                Commands.run(()->{drive.drive(-0.5,0,0,false);},drive).withTimeout(1/(4.8*0.5))//1 meter
         );
         NamedCommands.registerCommand("COMP - Auto w Align To Bump Start Position", 
             Commands.runOnce(()->{//Commands.runOnce works, but InstantCommand doesn't. don't ask me why.

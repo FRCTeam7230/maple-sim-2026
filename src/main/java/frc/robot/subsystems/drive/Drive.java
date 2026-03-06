@@ -569,7 +569,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
               DriveCommands.getLinearVelocityFromJoysticks(xSpeed, ySpeed);
 
           // Apply rotation deadband
-          double omega = MathUtil.applyDeadband(rotSpeed, 0);
+          double omega = MathUtil.applyDeadband(rotSpeed, 0.1);
 
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
@@ -580,6 +580,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
                   linearVelocity.getX() * getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * getMaxLinearSpeedMetersPerSec(),
                   omega * getMaxAngularSpeedRadPerSec());
+    if (fieldRelative){
           boolean isFlipped =
               false;
           runVelocity(
@@ -588,5 +589,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
                   isFlipped
                       ? getRotation().plus(new Rotation2d(Math.PI))
                       : getRotation()));
+    } else {
+        runVelocity(speeds);
+    }
   }
 }
