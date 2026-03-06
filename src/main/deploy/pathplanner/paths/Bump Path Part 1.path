@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.57,
-        "y": 5.2
+        "x": 3.560328102710413,
+        "y": 5.85
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.569999999999997,
-        "y": 5.2
+        "x": 4.560328102710409,
+        "y": 5.85
       },
       "isLocked": false,
       "linkedName": "Bump Auto Alliance Intake"
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 5.656390870185448,
-        "y": 5.2
+        "y": 5.85
       },
       "prevControl": {
         "x": 4.656390870185448,
-        "y": 5.2
+        "y": 5.85
       },
       "nextControl": null,
       "isLocked": false,

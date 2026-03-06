@@ -344,11 +344,14 @@ public class RobotContainer {
                     () -> -controller.getRawAxis(2) * rotMult)
         );
         //DriveCommands.updateCustomSpeedMult(1);
+new JoystickButton(controller, /*change*/4)
+                .onTrue(
+                        Commands.runOnce(
+                                ()->{alignToBump = new AlignToBump2(drive); 
+                                alignToBump.schedule();},
+                        drive)
+                ).onFalse(Commands.runOnce(()->alignToBump.cancel()));
 
-            Command goOverBump = DriveCommands.joystickDrive(drive,
-                        () -> DriverStation.getAlliance().equals(Optional.of(Alliance.Blue))?
-                        (drive.getPose().getX()<4.626?speedMult:-speedMult):
-                        (drive.getPose().getX()<11.915?speedMult:-speedMult),() -> 0, () -> 0);
         //         Command alignToBump = new AlignToBump2(drive);
                 
         //     new JoystickButton(controller, 10).onTrue(alignToBump);

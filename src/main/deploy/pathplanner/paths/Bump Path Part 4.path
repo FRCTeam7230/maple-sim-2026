@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 3.5820120481927713,
-        "y": 6.0
+        "y": 5.28
       },
       "prevControl": null,
       "nextControl": {
         "x": 3.9082674904218857,
-        "y": 6.095102959762975
+        "y": 5.375102959762975
       },
       "isLocked": false,
       "linkedName": "Bump Auto Alliance Shoot"

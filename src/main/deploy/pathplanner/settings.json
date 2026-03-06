@@ -3,7 +3,8 @@
   "robotLength": 0.61,
   "holonomicMode": true,
   "pathFolders": [
-    "Auto1"
+    "Auto1",
+    "New Folder"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.8,
