@@ -264,7 +264,7 @@ public class RobotContainer {
         if(controllerMode){
                // if (DriverStation.getAlliance().equals(Alliance.Red)){
                 drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> controller.getRawAxis(1)*speedMult, () -> controller.getRawAxis(0)*speedMult, () -> -controller.getRawAxis(4)*rotMult)
+                drive, () -> -controller.getRawAxis(1)*speedMult, () -> -controller.getRawAxis(0)*speedMult, () -> -controller.getRawAxis(4)*rotMult)
                 );//TODO: Joystick drive has an isFlipped boolean that flips for the alliance. 
                 // } else {
                 //         drive.setDefaultCommand(DriveCommands.joystickDrive(
@@ -275,35 +275,44 @@ public class RobotContainer {
             
             
             
-            new Trigger(() -> controller.getRawAxis(/*change*/2) > 0.5)
+            // new Trigger(() -> controller.getRawAxis(/*change*/2) > 0.5)
+            //     .onTrue(
+            //             Commands.runOnce(drive::intakeStart, drive)
+            //     );
+            //   new JoystickButton(controller, /*change*/5)
+            //     .onTrue(
+            //             Commands.runOnce(drive::intakeStop, drive)
+            //     );
+             new Trigger(() -> controller.getRawAxis(/*change*/2) > 0.5)
                 .onTrue(
-                        Commands.runOnce(drive::intakeStart, drive)
+                        Commands.runOnce(drive::toggleIntake, drive)
                 );
-              new JoystickButton(controller, /*change*/5)
-                .onTrue(
-                        Commands.runOnce(drive::intakeStop, drive)
-                );
-                new JoystickButton(controller, /*change*/6)
-                .onTrue(
-                        Commands.runOnce(() -> {alignToHub = new AlignToHub(drive); alignToHub.schedule();}, drive)
-                ).onFalse(Commands.runOnce(()->alignToHub.cancel()));
-                new JoystickButton(controller, /*change*/4)
-                .onTrue(
+                // new JoystickButton(controller, /*change*/6)
+                // .toggleOnTrue(new AlignToHub(drive)); // Schedule AlignToHub command
+               new JoystickButton(controller, /*change*/6)
+                .toggleOnTrue(
+                        Commands.runOnce(
+                                ()->{alignToHub = new AlignToHub(drive); 
+                                alignToHub.schedule();},
+                        drive)
+                ).toggleOnFalse(Commands.runOnce(()->alignToHub.cancel()));
+                new JoystickButton(controller, /*change*/1)
+                .toggleOnTrue(
                         Commands.runOnce(
                                 ()->{alignToBump = new AlignToBump2(drive); 
                                 alignToBump.schedule();},
                         drive)
-                ).onFalse(Commands.runOnce(()->alignToBump.cancel()));
+                ).toggleOnFalse(Commands.runOnce(()->alignToBump.cancel()));
                 new Trigger(() -> controller.getRawAxis(/*change*/3) > 0.5)
                 .whileTrue(//change to whiletrue for holding.
                             new SpamShootCommands(drive,false)
                 );
             // fix this to a pov, povDown GenericHID
-        //     new JoystickButton(controller, /*change*/2)
-        //         .whileTrue(DriveCommands.toggleDrive().alongWith(Commands.run(() -> controller.setRumble(
-        //                 RumbleType.kBothRumble, 0.5)))); //toggle Field Relative
-        // new JoystickButton(controller, 2)
-        //         .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+            new JoystickButton(controller, /*change*/2)
+                .whileTrue(DriveCommands.toggleDrive().alongWith(Commands.run(() -> controller.setRumble(
+                        RumbleType.kBothRumble, 0.5)))); //toggle Field Relative
+        new JoystickButton(controller, 8)
+                .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         
        // Arena2026Rebuilt a = SimulatedArena.getInstance();
 
@@ -345,7 +354,7 @@ public class RobotContainer {
         );
         //DriveCommands.updateCustomSpeedMult(1);
 new JoystickButton(controller, /*change*/4)
-                .onTrue(
+                .toggleOnTrue(
                         Commands.runOnce(
                                 ()->{alignToBump = new AlignToBump2(drive); 
                                 alignToBump.schedule();},

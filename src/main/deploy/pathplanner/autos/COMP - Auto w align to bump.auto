@@ -23,7 +23,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Stop Intake"
+                  "name": "Intake Fuel"
                 }
               }
             ]
@@ -42,7 +42,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Intake Fuel"
+                  "name": "Stop Intake"
                 }
               }
             ]

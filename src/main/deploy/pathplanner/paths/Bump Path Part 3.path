@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.5066191155492135,
-        "y": 4.403751783166904
+        "x": 7.7653922967189715,
+        "y": 4.416690442225392
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.314782451303767,
-        "y": 4.248772781001915
+        "x": 6.573555632473525,
+        "y": 4.261711440060403
       },
       "isLocked": false,
       "linkedName": "Intake Endpoint"
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 74.58295300593869
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }
