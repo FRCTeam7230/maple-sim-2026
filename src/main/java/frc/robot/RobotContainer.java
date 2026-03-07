@@ -61,6 +61,7 @@ public class RobotContainer {
         arena.isActive(true);
         arena.setShouldRunClock(true);
         arena.setEfficiencyMode(true);
+        arena.resetFieldForAuto();
         SimulatedArena.overrideInstance(arena);
         
 
