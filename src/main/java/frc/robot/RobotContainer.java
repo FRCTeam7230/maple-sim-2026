@@ -137,7 +137,6 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
 
-        drive.initalizeIntake();
     }
 
     double speedMult = 0.75;
@@ -165,14 +164,14 @@ public class RobotContainer {
             
             
             
-            new JoystickButton(controller, /*change*/1)
-                .onTrue(
-                        Commands.runOnce(drive::intakeStart, drive)
-                );
-            new JoystickButton(controller, /*change*/2)
-                .onTrue(
-                        Commands.runOnce(drive::intakeStop, drive)
-                );
+        //     new JoystickButton(controller, /*change*/1)
+        //         .onTrue(
+        //                 Commands.runOnce(drive::intakeStart, drive)
+        //         );
+        //     new JoystickButton(controller, /*change*/2)
+        //         .onTrue(
+        //                 Commands.runOnce(drive::intakeStop, drive)
+        //         );
             // fix this to a pov, povDown GenericHID
             new JoystickButton(controller, /*change*/2)
                 .whileTrue(DriveCommands.toggleDrive().alongWith(Commands.run(() -> controller.setRumble(
@@ -218,12 +217,12 @@ public class RobotContainer {
 
             new JoystickButton(controller, 1).onTrue(Commands.runOnce(drive::scoreFuel));
 
-            new JoystickButton(controller, 3)
-                    .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-                        new JoystickButton(controller, /*change*/7)
-                .onTrue(
-                        Commands.runOnce(drive::intakeStart, drive)
-                );
+        //     new JoystickButton(controller, 3)
+        //             .onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        //                 new JoystickButton(controller, /*change*/7)
+        //         .onTrue(
+        //                 Commands.runOnce(drive::intakeStart, drive)
+        //         );
             new JoystickButton(controller, 2)
             .whileTrue(
                 Commands.runOnce(resetGyro, drive)

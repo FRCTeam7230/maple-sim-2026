@@ -362,7 +362,7 @@ public ChassisSpeeds getChassisSpeeds() {
   }
   public void scoreFuel() {
     SmartDashboard.putNumber("Drive/velocity",velocity);
-    if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
+    // if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
     SimulatedArena.getInstance()
     .addGamePieceProjectile(new RebuiltFuelOnFly(
       // Obtain robot position from drive simulation
@@ -379,7 +379,7 @@ public ChassisSpeeds getChassisSpeeds() {
       MetersPerSecond.of(velocity),
       // The fuel is at 45degrees
       Degrees.of(70)));
-    }
+    // }
   }
   public static double randomInRange(double variance) {
       return (Math.random() - 0.5) * variance;

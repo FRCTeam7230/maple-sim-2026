@@ -34,7 +34,7 @@ public class AlignToHub extends Command {
 
   private final GenericHID controller = new GenericHID(0);
   private final Timer timer = new Timer();
-  double speedMult = 0.65;
+  double speedMult = 0.5;
   double globalTargetAngle;
   
   double lastTime;
@@ -64,7 +64,7 @@ public class AlignToHub extends Command {
     Pose2d currentPose = m_drive.getPose();
     double deltaTime = timer.get() - lastTime;
     lastTime = timer.get();
-    radalOffset = controller.getRawAxis(1)*deltaTime*20;
+    radalOffset = controller.getRawAxis(1)*deltaTime*35;
     double[] errors = CalculateHubPID(currentPose, radalOffset);
     double xSpeed = xController.calculate(errors[0]);
     double ySpeed = yController.calculate(errors[1]);
@@ -98,12 +98,13 @@ public class AlignToHub extends Command {
   double hubY = 4.03; // meters
   double hubXBlue = 4.63;
   double hubXRed = 11.92;
+  double hubHeight = 1.8146; // meters
   double shooterOffset = .46; //meters
   double initialEjectionVelocityBeforeOffset = 7; //m/s
   double initialEjectionVelocityAfterOffset; //m/s
-  double ejectionAngle = 68; //deg
-  double radiusToleranceForward = -0.7; //meters
-  double radiusToleranceBackward = 1.5; //meters
+  double ejectionAngle = 67; //deg
+  double radiusToleranceForward = -0.4; //meters
+  double radiusToleranceBackward = 3; //meters
 
   //declarations for scope
   double timeOfFlight;
@@ -154,6 +155,22 @@ public class AlignToHub extends Command {
       double distance = Math.sqrt( Math.pow( distanceX, 2) + Math.pow( distanceY, 2) );
 
       double radius = distance + radalOffset;
+      double targetVelocityX = Math.sqrt(
+        (9.81*Math.pow(distance, 2))
+        /(2*Math.tan(Math.toRadians(ejectionAngle))*distance - (hubHeight-0.38))
+        );
+      double velocityCancel = m_drive.getChassisSpeeds().vxMetersPerSecond;
+      if(velocityCancel>1.35){
+        velocityCancel *= 0.9;
+      } else if (velocityCancel>0.85){
+        velocityCancel *= 0.85;
+      } else if(velocityCancel<=0.85){
+        velocityCancel *= 1.2;
+      }
+      double targetVelocity =  targetVelocityX / Math.cos(Math.toRadians(ejectionAngle)) - velocityCancel;
+
+      SmartDashboard.putNumber("AlignToHub/targetVelocity", targetVelocity);
+      SmartDashboard.putNumber("AlignToHub/VelocityofRobotX", m_drive.getChassisSpeeds().vxMetersPerSecond);
 
       if((radius-Radius)>radiusToleranceBackward){
         radius = Radius + radiusToleranceBackward;
@@ -172,7 +189,7 @@ public class AlignToHub extends Command {
 
       //angle offset calculations
       initialEjectionVelocityAfterOffset = initialEjectionVelocityBeforeOffset + Math.abs(0.3*zInitialVelocityRobotRelative);
-      initialEjectionVelocityAfterOffset = initialEjectionVelocityAfterOffset + 0.8*(radius-Radius);
+      initialEjectionVelocityAfterOffset += targetVelocity-6.58865945551;
       m_drive.setInitialVelocity(initialEjectionVelocityAfterOffset);
       vx0 = initialEjectionVelocityBeforeOffset*Math.cos(Math.toRadians(ejectionAngle));
 
