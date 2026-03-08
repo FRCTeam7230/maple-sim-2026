@@ -67,7 +67,9 @@ public class AlignToBump2 extends Command{//This is the better edition
         }
         else if (currentY>Units.inchesToMeters(236.147)){
             yController.setSetpoint(Units.inchesToMeters(236.147));
-        } 
+        } else {
+            yController.setSetpoint(currentY);
+        }
         yController.setTolerance(0.1);
         // if (currentAngle>angle1 && currentAngle<angle3){115
         //     rotController.setSetpoint(angle1);115
