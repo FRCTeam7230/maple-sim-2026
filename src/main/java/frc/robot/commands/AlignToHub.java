@@ -56,6 +56,7 @@ public class AlignToHub extends Command {
   public void initialize() {
     timer.start();
     radalOffset = 0;
+    lastTime = timer.get();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -64,7 +65,7 @@ public class AlignToHub extends Command {
     Pose2d currentPose = m_drive.getPose();
     double deltaTime = timer.get() - lastTime;
     lastTime = timer.get();
-    radalOffset = controller.getRawAxis(1)*deltaTime*35;
+    radalOffset = controller.getRawAxis(1)*deltaTime*20;
     double[] errors = CalculateHubPID(currentPose, radalOffset);
     double xSpeed = xController.calculate(errors[0]);
     double ySpeed = yController.calculate(errors[1]);
@@ -98,13 +99,14 @@ public class AlignToHub extends Command {
   double hubY = 4.03; // meters
   double hubXBlue = 4.63;
   double hubXRed = 11.92;
-  double hubHeight = 1.8146; // meters
+  double hubHeight = 1.8288; // meters
   double shooterOffset = .46; //meters
   double initialEjectionVelocityBeforeOffset = 7; //m/s
   double initialEjectionVelocityAfterOffset; //m/s
   double ejectionAngle = 67; //deg
   double radiusToleranceForward = -0.4; //meters
   double radiusToleranceBackward = 3; //meters
+  double DistMulti = 0; //meters
 
   //declarations for scope
   double timeOfFlight;
@@ -156,8 +158,8 @@ public class AlignToHub extends Command {
 
       double radius = distance + radalOffset;
       double targetVelocityX = Math.sqrt(
-        (9.81*Math.pow(distance, 2))
-        /(2*Math.tan(Math.toRadians(ejectionAngle))*distance - (hubHeight-0.38))
+        (9.81*Math.pow(distance*1.1, 2))
+        /(2*Math.tan(Math.toRadians(ejectionAngle))*distance*1.1 - (hubHeight-0.38))
         );
       double velocityCancel = m_drive.getChassisSpeeds().vxMetersPerSecond;
       if(velocityCancel>1.35){
@@ -190,6 +192,12 @@ public class AlignToHub extends Command {
       //angle offset calculations
       initialEjectionVelocityAfterOffset = initialEjectionVelocityBeforeOffset + Math.abs(0.3*zInitialVelocityRobotRelative);
       initialEjectionVelocityAfterOffset += targetVelocity-6.58865945551;
+      double VyFinal = initialEjectionVelocityAfterOffset*Math.sin(errorAngle);
+      double timeUP = -VyFinal/9.81;
+      double yDistanceUP = VyFinal*timeUP+(0.5*9.81*Math.pow(timeUP, 2));
+      double totalDistanceY = (yDistanceUP-0.38) + (yDistanceUP-hubHeight);
+      double totalDistance = totalDistanceY+distance;
+      initialEjectionVelocityAfterOffset += totalDistance*DistMulti;
       m_drive.setInitialVelocity(initialEjectionVelocityAfterOffset);
       vx0 = initialEjectionVelocityBeforeOffset*Math.cos(Math.toRadians(ejectionAngle));
 
