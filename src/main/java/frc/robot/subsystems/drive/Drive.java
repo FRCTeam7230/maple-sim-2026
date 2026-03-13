@@ -374,7 +374,7 @@ public ChassisSpeeds getChassisSpeeds() {
       // Obtain robot facing from drive simulation
       driveSimulation.getSimulatedDriveTrainPose().getRotation(),
       // The height at which the fuel is ejected
-      Meters.of(.38),
+      Meters.of(.677),
       // The initial speed of the fuel
       MetersPerSecond.of(velocity),
       // The fuel is at 45degrees
