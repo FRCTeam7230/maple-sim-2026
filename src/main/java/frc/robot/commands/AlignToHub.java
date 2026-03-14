@@ -33,6 +33,10 @@ public class AlignToHub extends Command {
     yController.setSetpoint(0);
     rotController.setSetpoint(0);
     rotController.enableContinuousInput(-180, 180);
+    
+    xController.setTolerance(0.05);
+    yController.setTolerance(0.05);
+    rotController.setTolerance(3);
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_drive);
   }
@@ -69,7 +73,7 @@ public class AlignToHub extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return xController.atSetpoint() && yController.atSetpoint() && rotController.atSetpoint();
   }
     public double[] CalculateHubPID(Pose2d pose) {
         double robotX = pose.getX();

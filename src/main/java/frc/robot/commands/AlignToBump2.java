@@ -30,11 +30,14 @@ public class AlignToBump2 extends Command{//This is the better edition
 
     double goalAngle = 38.412;//Angles 38.412, 141.588, -38.412, -141.588 all work for align to bump.
 
-    public AlignToBump2(Drive drive) {
+    public AlignToBump2(Drive drive, boolean autoMode) {
         rotController.setSetpoint(0);//This makes the robot face 0 degrees.
         rotController.enableContinuousInput(-180, 180);
         m_drive = drive;
-        bumpSpeed = 4.8;
+       // bumpSpeed = 4.8;
+       if (autoMode){
+        drivingOverTheBumpDirectionMode = findDrivingDirection();
+       }
         addRequirements(m_drive);//i removed this when testing it with a button.
     }
      double angle1 = goalAngle;//38.412115
@@ -86,16 +89,16 @@ public class AlignToBump2 extends Command{//This is the better edition
         //Center of red bump: 468.6
         currentX = m_drive.getPose().getX();
         if (currentX<Units.inchesToMeters(181.56)) {//38.3813 in. robot diagonal length115
-            xController.setSetpoint(Units.inchesToMeters(147.16-robotDiagonalLength/2));
+            xController.setSetpoint(Units.inchesToMeters(152.16-robotDiagonalLength/2));
         }
         else if (currentX>Units.inchesToMeters(181.56)&&currentX<Units.inchesToMeters(325.06)){  
-            xController.setSetpoint(Units.inchesToMeters(215.96+robotDiagonalLength/2));  
+            xController.setSetpoint(Units.inchesToMeters(220.96+robotDiagonalLength/2));  
         }
         else if (currentX<Units.inchesToMeters(468.6)&&currentX>Units.inchesToMeters(325.06)){
-            xController.setSetpoint(Units.inchesToMeters(434.2-robotDiagonalLength/2));
+            xController.setSetpoint(Units.inchesToMeters(439.2-robotDiagonalLength/2));
         }
         else if (currentX>Units.inchesToMeters(468.6)){
-            xController.setSetpoint(Units.inchesToMeters(503+robotDiagonalLength/2));
+            xController.setSetpoint(Units.inchesToMeters(508+robotDiagonalLength/2));
         } else {
             xController.setSetpoint(currentX);
         }
@@ -176,7 +179,7 @@ public class AlignToBump2 extends Command{//This is the better edition
     }
     @Override
     public void end(boolean interrupted) {
-        m_drive.stop();
+        m_drive.drive(0,0,0,false);
     }
     @Override 
     public boolean isFinished(){

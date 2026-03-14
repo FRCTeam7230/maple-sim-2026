@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.InternalButton;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -159,11 +160,11 @@ public class RobotContainer {
         drive.initalizeIntake();
         NamedCommands.registerCommand("Align",(new AlignToHub(drive)));
 
-        NamedCommands.registerCommand("Shoot", new SpamShootCommands(drive, true));
+        NamedCommands.registerCommand("Shoot", new RunCommand(drive::scoreFuel, drive).andThen(new WaitCommand(1)).repeatedly().until(() -> !drive.hasFuelInIntake()));
          NamedCommands.registerCommand("Align To Bump", 
-                new AlignToBump2(drive)
+                new AlignToBump2(drive,true)
         );
-        SmartDashboard.putData("Align To Bump Command", new AlignToBump2(drive));
+        SmartDashboard.putData("Align To Bump Command", new AlignToBump2(drive,false));
         SmartDashboard.putData("Align To Hub Command", new AlignToHub(drive));
         NamedCommands.registerCommand("Intake Fuel", 
                 Commands.runOnce(drive::intakeStart, drive)
@@ -299,7 +300,7 @@ public class RobotContainer {
                 new JoystickButton(controller, /*change*/1)
                 .toggleOnTrue(
                         Commands.runOnce(
-                                ()->{alignToBump = new AlignToBump2(drive); 
+                                ()->{alignToBump = new AlignToBump2(drive,false); 
                                 alignToBump.schedule();},
                         drive)
                 ).toggleOnFalse(Commands.runOnce(()->alignToBump.cancel()));
@@ -356,7 +357,7 @@ public class RobotContainer {
 new JoystickButton(controller, /*change*/4)
                 .toggleOnTrue(
                         Commands.runOnce(
-                                ()->{alignToBump = new AlignToBump2(drive); 
+                                ()->{alignToBump = new AlignToBump2(drive,false); 
                                 alignToBump.schedule();},
                         drive)
                 ).onFalse(Commands.runOnce(()->alignToBump.cancel()));
