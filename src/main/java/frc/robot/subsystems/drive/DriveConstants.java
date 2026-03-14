@@ -123,5 +123,7 @@ public class DriveConstants {
                     Volts.of(0.1),
                     Meters.of(wheelRadiusMeters),
                     KilogramSquareMeters.of(0.02),
-                    wheelCOF));
+                    wheelCOF))
+                .withTrackLengthTrackWidth(Inches.of(26.25),Inches.of(20.8))
+                .withBumperSize(Inches.of(29.75),Inches.of(24.25));
 }

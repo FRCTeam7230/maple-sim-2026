@@ -447,11 +447,21 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   public boolean hasFuelInIntake(){
     return this.intakeSimulation.getGamePiecesAmount() > 0;
   }
+  boolean intakeToggle = false;
   public void intakeStop(){
     this.intakeSimulation.stopIntake();
+    intakeToggle = false;
   }
   public void intakeStart(){
     this.intakeSimulation.startIntake();
+    intakeToggle = true;
+  }
+  public void toggleIntake(){
+    if (intakeToggle){
+      intakeStop();
+    } else {
+      intakeStart();
+    }
   }
     // public void spamScore(){
     //   Command score = new SequentialCommandGroup(
