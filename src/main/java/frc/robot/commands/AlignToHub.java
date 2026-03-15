@@ -106,7 +106,7 @@ public class AlignToHub extends Command {
   double ejectionAngle = 67; //deg
   double radiusToleranceForward = -0.6; //meters
   double radiusToleranceBackward = 3; //meters
-  double DistMulti = 0; //meters
+  double DistMulti = 1.1; //multi, minimum should be 1.1
 
   //declarations for scope
   double timeOfFlight;
@@ -158,8 +158,8 @@ public class AlignToHub extends Command {
 
       double radius = distance + radalOffset;
       double targetVelocityX = Math.sqrt(
-        (9.81*Math.pow(distance*1.1, 2))
-        /(2*Math.tan(Math.toRadians(ejectionAngle))*distance*1.1 - (hubHeight-0.677))
+        (9.81*Math.pow(distance*DistMulti, 2))
+        /(2*Math.tan(Math.toRadians(ejectionAngle))*distance*DistMulti - (hubHeight-0.677))
         );
       double velocityCancel = m_drive.getChassisSpeeds().vxMetersPerSecond;
       if(velocityCancel>1.35){
@@ -192,12 +192,6 @@ public class AlignToHub extends Command {
       //angle offset calculations
       initialEjectionVelocityAfterOffset = initialEjectionVelocityBeforeOffset + Math.abs(0.3*zInitialVelocityRobotRelative);
       initialEjectionVelocityAfterOffset += targetVelocity-6.58;
-      // double VyFinal = initialEjectionVelocityAfterOffset*Math.sin(errorAngle);
-      // double timeUP = -VyFinal/9.81;
-      // double yDistanceUP = VyFinal*timeUP+(0.5*9.81*Math.pow(timeUP, 2));
-      // double totalDistanceY = (yDistanceUP-0.38) + (yDistanceUP-hubHeight);
-      // double totalDistance = totalDistanceY+distance;
-      // initialEjectionVelocityAfterOffset += totalDistance*DistMulti;
       m_drive.setInitialVelocity(initialEjectionVelocityAfterOffset);
       vx0 = initialEjectionVelocityBeforeOffset*Math.cos(Math.toRadians(ejectionAngle));
 
