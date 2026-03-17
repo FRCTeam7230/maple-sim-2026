@@ -55,6 +55,7 @@ public class AlignToBump2 extends Command{//This is the better edition
         // currentAngle += 360;115
         // }115
 
+        //This makes sure the robot angle between 0 to 360, so we can use it to determine the current robot heading
         drivingOverTheBumpDirectionMode = 0;
         currentAngle = m_drive.getPose().getRotation().getDegrees();
         while (currentAngle > 360 || currentAngle<0) {
@@ -127,6 +128,8 @@ public class AlignToBump2 extends Command{//This is the better edition
         // } else {
         //     rotController.setSetpoint(angle1);
         // }
+
+        //used to find closest angle and sets as target angle
         if (currentAngle>90&&currentAngle<180){
             rotController.setSetpoint(angle2);
         } else if (currentAngle>180&&currentAngle<270){
@@ -146,6 +149,8 @@ public class AlignToBump2 extends Command{//This is the better edition
     @Override
     public void execute() {
        // SmartDashboard.putNumber("AlignToBump/driveState", drivingOverTheBumpDirectionMode);
+
+       //Drives to position
         switch (drivingOverTheBumpDirectionMode){
             case 1:
             case 3:
@@ -178,11 +183,13 @@ public class AlignToBump2 extends Command{//This is the better edition
         }
     }
     @Override
+    //stops the robot at the end of the command
     public void end(boolean interrupted) {
         m_drive.drive(0,0,0,false);
     }
     @Override 
     public boolean isFinished(){
+        //checks if it is finished by checking if robot has driven over bump
         switch (drivingOverTheBumpDirectionMode){
             case 1:
                 return m_drive.getPose().getX()>4.626+0.5588+odomError;
@@ -198,6 +205,7 @@ public class AlignToBump2 extends Command{//This is the better edition
                 return false;
         }
     }
+    /** Returns the driving direction based on the robot's current x position */
     public int findDrivingDirection(){
         double xPos = m_drive.getPose().getX();//This cannnot be updated in periodic
         if (xPos<8.256) { //If the robot is on the blue side of the field
