@@ -17,9 +17,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Intake From Depot"
+            "pathName": "A2"
           }
         },
         {

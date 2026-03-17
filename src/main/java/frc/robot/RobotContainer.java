@@ -82,7 +82,7 @@ public class RobotContainer {
     private final Vision vision;
 
     // Controller
-    private final Boolean controllerMode = true;
+    private final Boolean controllerMode = false;
     private final GenericHID controller = new GenericHID(0);
    private  GenericHIDSim controllerSim = new GenericHIDSim(controller);
         

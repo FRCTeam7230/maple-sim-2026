@@ -10,8 +10,8 @@ import edu.wpi.first.math.util.Units;
 
 public class AlignToBump2 extends Command{//This is the better edition
     PIDController rotController = new PIDController(0.07, 0, 0);
-    PIDController yController = new PIDController(1, 0, 0);
-    PIDController xController = new PIDController(1, 0, 0);
+    PIDController yController = new PIDController(3, 0, 0);
+    PIDController xController = new PIDController(3, 0, 0);
     Drive m_drive;
     double robotDiagonalLength = 38.3813;
     //double robotDiagonalLength = Units.inchesToMeters(42.426);
@@ -92,13 +92,13 @@ public class AlignToBump2 extends Command{//This is the better edition
             xController.setSetpoint(Units.inchesToMeters(152.16-robotDiagonalLength/2));
         }
         else if (currentX>Units.inchesToMeters(181.56)&&currentX<Units.inchesToMeters(325.06)){  
-            xController.setSetpoint(Units.inchesToMeters(220.96+robotDiagonalLength/2));  
+            xController.setSetpoint(Units.inchesToMeters(210.96+robotDiagonalLength/2));  
         }
         else if (currentX<Units.inchesToMeters(468.6)&&currentX>Units.inchesToMeters(325.06)){
             xController.setSetpoint(Units.inchesToMeters(439.2-robotDiagonalLength/2));
         }
         else if (currentX>Units.inchesToMeters(468.6)){
-            xController.setSetpoint(Units.inchesToMeters(508+robotDiagonalLength/2));
+            xController.setSetpoint(Units.inchesToMeters(498+robotDiagonalLength/2));
         } else {
             xController.setSetpoint(currentX);
         }
