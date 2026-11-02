@@ -65,7 +65,7 @@ public class AlignToHub extends Command {
     Pose2d currentPose = m_drive.getPose();
     double deltaTime = timer.get() - lastTime;
     lastTime = timer.get();
-    radalOffset = controller.getRawAxis(1)*deltaTime*30;
+    radalOffset = controller.getRawAxis(3)*deltaTime*10;
     double[] errors = CalculateHubPID(currentPose, radalOffset);
     double xSpeed = xController.calculate(errors[0]);
     double ySpeed = yController.calculate(errors[1]);
@@ -74,8 +74,8 @@ public class AlignToHub extends Command {
     
     drivecommand = DriveCommands.joystickDrive(
       m_drive,
-      ()->{return -(xSpeed + (controller.getRawAxis(0) * speedMult * Math.sin(Math.toRadians(-globalTargetAngle))));},
-      ()->{return -(ySpeed  + (controller.getRawAxis(0) * speedMult * Math.cos(Math.toRadians(-globalTargetAngle))));},
+      ()->{return -(xSpeed + (controller.getRawAxis(0) * 0 * Math.sin(Math.toRadians(-globalTargetAngle))));},
+      ()->{return -(ySpeed  + (controller.getRawAxis(0) * 0 * Math.cos(Math.toRadians(-globalTargetAngle))));},
       ()->{return -rotSpeed;});
     drivecommand.execute();
   }

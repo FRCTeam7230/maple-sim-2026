@@ -49,7 +49,7 @@ public class RobotContainer {
     private final Vision vision;
 
     // Controller
-    private final Boolean controllerMode = false;
+    private final Boolean controllerMode = true;
     private final GenericHID controller = new GenericHID(0);
 
     // Dashboard inputs
@@ -162,34 +162,43 @@ public class RobotContainer {
                 drive, () -> -controller.getRawAxis(1)*2, () -> -controller.getRawAxis(0)*2, () -> controller.getRawAxis(4))
                 );
             
+            drive.initalizeIntake();
             
-            
-        //     new JoystickButton(controller, /*change*/1)
-        //         .onTrue(
-        //                 Commands.runOnce(drive::intakeStart, drive)
-        //         );
-        //     new JoystickButton(controller, /*change*/2)
-        //         .onTrue(
-        //                 Commands.runOnce(drive::intakeStop, drive)
-        //         );
+            new Trigger(() -> controller.getRawAxis(/*change*/2) > 0.5) //Intake toggle Left Trigger
+                .onTrue(
+                        Commands.runOnce(drive::intakeStart, drive)
+                )
+                .onFalse(
+                    Commands.runOnce(drive::intakeStart, drive)
+                );
+
+            new JoystickButton(controller, 5) //align LB
+                .whileTrue(
+                    Commands.runOnce(resetGyro, drive)
+                    .ignoringDisable(true)
+                    .andThen(new InstantCommand(()->{AlignToHub.setGlobalAngleOffsetRad0();}))
+                    .andThen(new AlignToHub(drive))
+                );
+
             // fix this to a pov, povDown GenericHID
-            new JoystickButton(controller, /*change*/2)
+            new JoystickButton(controller, /*change*/2) // B
                 .whileTrue(DriveCommands.toggleDrive().alongWith(Commands.run(() -> controller.setRumble(
                         RumbleType.kBothRumble, 0.5)))); //toggle Field Relative
 
-            new JoystickButton(controller, /*change*/3)
-                .onTrue(
-                        Commands.runOnce(drive::spawnFuel, drive)
-                );
 
-            new JoystickButton(controller, /*change*/5) 
-                .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, slowSpeed, 0));
+            // new JoystickButton(controller, /*change*/3)
+            //     .onTrue(
+            //             Commands.runOnce(drive::spawnFuel, drive)
+            //     );
+
+            // new JoystickButton(controller, /*change*/5) //LB
+            //     .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, slowSpeed, 0));
                     
-            new JoystickButton(controller, /*change*/6)
-                .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, -slowSpeed, 0));
+            // new JoystickButton(controller, /*change*/6) //RB
+            //     .whileTrue(DriveCommands.robotJoystickDrive(drive, 0, -slowSpeed, 0));
 
 
-            new Trigger(() -> controller.getRawAxis(/*change*/3) > 0.5)
+            new Trigger(() -> controller.getRawAxis(/*change*/3) > 0.5) //RT
                 .onTrue(
                         Commands.runOnce(drive::scoreFuel, drive)
                 );
