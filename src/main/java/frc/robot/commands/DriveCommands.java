@@ -28,6 +28,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -99,13 +100,22 @@ public class DriveCommands {
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
           boolean isFlipped =
-              false;
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
+              DriverStation.getAlliance().equals(Optional.of(DriverStation.Alliance.Red));
+          if(getFieldRelative()){
+            drive.runVelocity(
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                    speeds,
+                    isFlipped
+                        ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                        : drive.getRotation()));
+          } else {
+            drive.runVelocity(
+              ChassisSpeeds.fromRobotRelativeSpeeds(
                   speeds,
                   isFlipped
-                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      ? drive.getRotation().plus(new Rotation2d(2*Math.PI))
                       : drive.getRotation()));
+          }
         },
         drive);
   }

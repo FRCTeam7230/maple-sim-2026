@@ -362,23 +362,27 @@ public ChassisSpeeds getChassisSpeeds() {
   }
   public void scoreFuel() {
     SmartDashboard.putNumber("Drive/velocity",velocity);
-    // if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
-    SimulatedArena.getInstance()
-    .addGamePieceProjectile(new RebuiltFuelOnFly(
-      // Obtain robot position from drive simulation
-      driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-      // The scoring mechanism 
-      new Translation2d(0.46, 0),
-      // Obtain robot speed from drive simulation
-      driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-      // Obtain robot facing from drive simulation
-      driveSimulation.getSimulatedDriveTrainPose().getRotation(),
-      // The height at which the fuel is ejected
-      Meters.of(.677),
-      // The initial speed of the fuel
-      MetersPerSecond.of(velocity),
-      // The fuel is at 45degrees
-      Degrees.of(70)));
+    if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
+      SimulatedArena.getInstance()
+      .addGamePieceProjectile(
+          new RebuiltFuelOnFly(
+          // Obtain robot position from drive simulation
+          driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
+          // The scoring mechanism 
+          new Translation2d(0.46, 0),
+          // Obtain robot speed from drive simulation
+          driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+          // Obtain robot facing from drive simulation
+          driveSimulation.getSimulatedDriveTrainPose().getRotation(),
+          // The height at which the fuel is ejected
+          Meters.of(.677),
+          // The initial speed of the fuel
+          MetersPerSecond.of(velocity),
+          // The fuel is at 45degrees
+          Degrees.of(70)
+          )
+        );
+    }
     // }
   }
   public static double randomInRange(double variance) {

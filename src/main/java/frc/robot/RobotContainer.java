@@ -159,7 +159,9 @@ public class RobotContainer {
 
         if(controllerMode){
             drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getRawAxis(1)*2, () -> -controller.getRawAxis(0)*2, () -> controller.getRawAxis(4))
+                drive, () -> -controller.getRawAxis(1)*2, 
+                    () -> -controller.getRawAxis(0)*2, 
+                    () -> controller.getRawAxis(4))
                 );
             
             drive.initalizeIntake();
@@ -169,7 +171,7 @@ public class RobotContainer {
                         Commands.runOnce(drive::intakeStart, drive)
                 )
                 .onFalse(
-                    Commands.runOnce(drive::intakeStart, drive)
+                    Commands.runOnce(drive::intakeStop, drive)
                 );
 
             new JoystickButton(controller, 5) //align LB
@@ -182,8 +184,7 @@ public class RobotContainer {
 
             // fix this to a pov, povDown GenericHID
             new JoystickButton(controller, /*change*/2) // B
-                .whileTrue(DriveCommands.toggleDrive().alongWith(Commands.run(() -> controller.setRumble(
-                        RumbleType.kBothRumble, 0.5)))); //toggle Field Relative
+                .onTrue(DriveCommands.toggleDrive()); //toggle Field Relative
 
 
             // new JoystickButton(controller, /*change*/3)
