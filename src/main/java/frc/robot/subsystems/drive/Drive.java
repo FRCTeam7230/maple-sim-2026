@@ -36,7 +36,9 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -87,6 +89,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
   public SwerveDriveSimulation driveSimulation;
   private IntakeSimulation intakeSimulation;
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
+
+  private double lastTime; //Last time the shooter shot for spamShoot()
   
   public Drive(
       GyroIO gyroIO,
@@ -139,6 +143,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer{
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+    lastTime = 0;
   }
 
   @Override
@@ -432,20 +437,36 @@ public ChassisSpeeds getChassisSpeeds() {
   public void intakeStart(){
     this.intakeSimulation.startIntake();
   }
-    // public void spamScore(){
-    //   Command score = new SequentialCommandGroup(
-    //     new InstantCommand(() -> scoreFuel()),
-    //     new WaitCommand(1)
-    //   ).repeatedly();
 
-    //     // int counter = 200;
-    //     // if (this.intakeSimulation.getGamePiecesAmount() > 0){
-    //     //   counter--;
-    //     //   if (counter <= 0){
-    //     //     scoreFuel();
-    //     //     counter = 200;
-    //     //   }
-    //     // }
-    // }
+  public void spamScore(){
+    SmartDashboard.putNumber("Drive/velocity",velocity);
+    double time = Timer.getFPGATimestamp();
+    SmartDashboard.putNumber("Drive/time",time);
+    
+    if(time >= lastTime+0.2 || time == -1){
+      if (this.intakeSimulation.obtainGamePieceFromIntake()){//the method automatically removes the fuel from intake.
+        SimulatedArena.getInstance()
+        .addGamePieceProjectile(
+            new RebuiltFuelOnFly(
+            // Obtain robot position from drive simulation
+            driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
+            // The scoring mechanism 
+            new Translation2d(0.46, 0),
+            // Obtain robot speed from drive simulation
+            driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+            // Obtain robot facing from drive simulation
+            driveSimulation.getSimulatedDriveTrainPose().getRotation(),
+            // The height at which the fuel is ejected
+            Meters.of(.677),
+            // The initial speed of the fuel
+            MetersPerSecond.of(velocity),
+            // The fuel is at 45degrees
+            Degrees.of(68)
+            )
+          );
+          lastTime = time;
+      }
+    }
+  }
     
 }

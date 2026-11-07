@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
@@ -54,6 +55,8 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+
+    private RobotBumpSim robotBumpSim;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -137,6 +140,7 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
 
+        robotBumpSim = new RobotBumpSim(DriveConstants.mapleSimConfig.moduleTranslations);
     }
 
     double speedMult = 0.75;
@@ -161,7 +165,7 @@ public class RobotContainer {
             drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getRawAxis(1)*2, 
                     () -> -controller.getRawAxis(0)*2, 
-                    () -> controller.getRawAxis(4))
+                    () -> -controller.getRawAxis(4))
                 );
             
             drive.initalizeIntake();
@@ -200,8 +204,8 @@ public class RobotContainer {
 
 
             new Trigger(() -> controller.getRawAxis(/*change*/3) > 0.5) //RT
-                .onTrue(
-                        Commands.runOnce(drive::scoreFuel, drive)
+                .whileTrue(
+                        Commands.run(drive::spamScore, drive)
                 );
             
                 
@@ -268,5 +272,13 @@ public class RobotContainer {
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
         Logger.recordOutput(
                 "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+    }
+
+    public Drive getDrive(){
+        return drive;
+    }
+
+    public RobotBumpSim getRobotBumpSim(){
+        return this.robotBumpSim;
     }
 }

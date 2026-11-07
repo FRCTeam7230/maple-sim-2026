@@ -14,10 +14,14 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.drive.RobotBumpSim;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
@@ -166,6 +170,23 @@ public class Robot extends LoggedRobot {
     public void simulationPeriodic() {
         Logger.recordOutput("Hub/blue/score", SimulatedArena.getInstance().getScore(true));
         Logger.recordOutput("Hub/red/score", SimulatedArena.getInstance().getScore(false));
+        
         robotContainer.updateSimulation();
+
+        Pose2d simPose =
+            robotContainer.getDrive().driveSimulation.getSimulatedDriveTrainPose();
+
+        ChassisSpeeds fieldRelativeSpeeds = 
+            robotContainer.getDrive().driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
+
+        Pose3d simPose3d =
+            robotContainer.getRobotBumpSim().update(simPose, fieldRelativeSpeeds, 5);
+        Logger.recordOutput("Drive/Pose3d", simPose3d);
+
+        if (robotContainer.getRobotBumpSim().isOnRamp()) {
+            robotContainer.getDrive().driveSimulation.setSimulationWorldPose(
+                robotContainer.getRobotBumpSim().getSimWorldPose(simPose)
+            );
+        }
     }
 }
