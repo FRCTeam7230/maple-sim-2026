@@ -186,6 +186,9 @@ public class RobotContainer {
                     .andThen(new AlignToHub(drive))
                 );
 
+            new JoystickButton(controller, 1).
+            whileTrue(DriveCommands.robotJoystickDrive(drive,0.1,0.0,0.0));
+
             // fix this to a pov, povDown GenericHID
             new JoystickButton(controller, /*change*/2) // B
                 .onTrue(DriveCommands.toggleDrive()); //toggle Field Relative
